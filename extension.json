@@ -1,0 +1,46 @@
+{
+	"name": "VeTemplates",
+	"version": "1.0.0",
+	"author": [
+		"Pierre Boutet"
+	],
+	"url": "https://github.com/wikifab",
+	"descriptionmsg": "vetemplates-desc",
+	"license-name": "MIT",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.28.0"
+	},
+	"MessagesDirs": {
+		"VeTemplates": [
+			"i18n"
+		]
+	},
+	"Hooks": {
+		"FormEdit::showEditForm:initial": [
+			"VeTemplates\\Hooks::start"
+		]
+	},
+	"ResourceModules": {
+		"ext.vetemplates.init": {
+			"scripts": [
+				"modules/vetemplate.simpletemplateregister.js",
+				"modules/vetemplates.init.js"
+			],
+			"dependencies": [
+				"ext.visualEditor.core",
+				"ext.visualEditor.mwtransclusion"
+			],
+			"messages": [
+			]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteExtPath": "VeTemplates"
+	},
+	"AutoloadClasses": {
+		"VeTemplates\\Hooks": "includes/Hooks.php"
+	},
+	"manifest_version": 1
+}

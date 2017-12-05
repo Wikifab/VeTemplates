@@ -1,0 +1,8 @@
+{
+    "name": "wikifab/ve-templates",
+    "description": "Mediawiki extension to add templates in Visual Editor",
+    "type": "mediawiki-extension",
+    "license": "MIT",
+    "require": {
+    }
+}
