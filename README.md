@@ -14,6 +14,28 @@ Installation
 2. add the folling Line to your LocalSettings.php file :
 > wfLoadExtension('VeTemplates');
 
+To be in the toolbar, they must be calle in the toolbar declaration in VE : 
+example : 
+		{
+			header: OO.ui.deferMsg( 'visualeditor-toolbar-insert' ),
+			title: OO.ui.deferMsg( 'visualeditor-toolbar-insert' ),
+			type: 'list',
+			icon: 'add',
+			label: '',
+			include: [  'warningblock','infoblock', 'ideablock']
+		},
+		
+		
+
+Usage
+===============
+
+Currently, simple template are created for 3 templates (Info, Warning, and Idea)
+tu use them, you must create the wikipage template (ex: page Template:Idea )
+They are added to the VE tolbar so you can add it into the editor. Then by clicking on the template, you can edit his content.
+
+
+
 
 Example
 ===============

@@ -31,10 +31,10 @@ vetemplate.simpleTemplateRegister = {
 			} ];
 			
 			var commandName = templateName.toLowerCase().replace(/[^a-z]/g, "") + 'block';
-			
+
 			ve.ui.commandRegistry.register(
-				new ve.ui.Command( commandName, 'content', 'insert', {
-					args: [ templateInfo, false, true ],
+				new ve.ui.Command( commandName, 'simpletemplateaction', 'insert', {
+					args: [ templateInfo, false, false ],
 					supportedSelections: [ 'linear' ]
 				} )
 			);
