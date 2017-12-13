@@ -41,7 +41,9 @@ ve.ui.SimpleTemplateAction.static.methods = ve.ui.SimpleTemplateAction.super.sta
  */
 ve.ui.SimpleTemplateAction.prototype.insert = function ( content, annotate, collapseToEnd ) {
 	
-	ve.ui.SimpleTemplateAction.super.prototype.insert.apply( this, [content, annotate, collapseToEnd] );
+	// copy to avoid multiple nodes using the same data structure :
+	var newContent = ve.copy(content);
+	ve.ui.SimpleTemplateAction.super.prototype.insert.apply( this, [newContent, annotate, collapseToEnd] );
 	
 	this.surface.execute( 'window', 'open', 'simpletemplateinspector' );
 	
