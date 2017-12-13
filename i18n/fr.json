@@ -4,5 +4,9 @@
             "Pierre Boutet"
         ]
     },
-	"vetemplates-desc": "ajout de templates dans Visual editor"
+	"vetemplates-desc": "ajout de templates dans Visual editor",
+	"vetemplate-dialogbutton-template-title-info": "Info",
+	"vetemplate-dialogbutton-template-title-warning": "Attention",
+	"vetemplate-dialogbutton-template-title-caution": "Attention",
+	"vetemplate-dialogbutton-template-title-dont": "À ne pas faire"
 }

@@ -1,11 +1,13 @@
 
-vetemplate =  {};
 
 vetemplate.simpleTemplateRegister = {
 		
 		registerTemplate: function(templateName) {
+			// 2 element in this array : the element opening the translcusion block, 
+			// and the one closing it (with '/' ahead)
 			var templateInfo = [ {
-				type: 'mwTransclusionBlock',
+				//type: 'mwTransclusionBlock',
+				type: 'simpleTransclusion',
 				attributes: {
 					mw: {
 						parts: [ {
@@ -24,7 +26,8 @@ vetemplate.simpleTemplateRegister = {
 					}
 				}
 			}, {
-				type: '/mwTransclusionBlock'
+				//type: '/mwTransclusionBlock'
+				type: '/simpleTransclusion'
 			} ];
 			
 			var commandName = templateName.toLowerCase().replace(/[^a-z]/g, "") + 'block';
@@ -37,6 +40,7 @@ vetemplate.simpleTemplateRegister = {
 			);
 			
 			//Create and register tool
+			// tools are used only to add button in the toolbar
 			function MyToolInfo() {
 				MyToolInfo.parent.apply( this, arguments );
 			}

@@ -4,5 +4,9 @@
             "Pierre Boutet"
         ]
     },
-	"vetemplates-desc": "Add templates in Visual Editor"
+	"vetemplates-desc": "Add templates in Visual Editor",
+	"vetemplate-dialogbutton-template-title-info": "Info",
+	"vetemplate-dialogbutton-template-title-warning": "Warning",
+	"vetemplate-dialogbutton-template-title-caution": "Warning",
+	"vetemplate-dialogbutton-template-title-dont": "Not to do"
 }

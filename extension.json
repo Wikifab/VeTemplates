@@ -22,16 +22,32 @@
 		]
 	},
 	"ResourceModules": {
+		"ext.vetemplates.css": {
+			"style": [
+				"style/style.css"
+			]
+		},
 		"ext.vetemplates.init": {
 			"scripts": [
+				"modules/vetemplate.base.js",
+				"modules/vetemplate.dm.SimpleTransclusionNode.js",
+				"modules/vetemplate.ce.SimpleTransclusionNode.js",
+				"modules/vetemplate.ui.SimpleTemplateContextItem.js",
 				"modules/vetemplate.simpletemplateregister.js",
+				"modules/vetemplate.ui.simpletemplatetool.js",
+				"modules/vetemplate.ui.simpleTemplateInspector.js",
 				"modules/vetemplates.init.js"
 			],
 			"dependencies": [
 				"ext.visualEditor.core",
-				"ext.visualEditor.mwtransclusion"
+				"ext.visualEditor.mwtransclusion",
+				"ext.vetemplates.css"
 			],
 			"messages": [
+				"vetemplate-dialogbutton-template-title-info",
+				"vetemplate-dialogbutton-template-title-warning",
+				"vetemplate-dialogbutton-template-title-caution",
+				"vetemplate-dialogbutton-template-title-dont"
 			]
 		}
 	},
