@@ -5,6 +5,7 @@
         ]
     },
 	"vetemplates-desc": "Add templates in Visual Editor",
+	"visualeditor-SimpleTemplateInspector-title": "Edit",
 	"vetemplate-dialogbutton-template-title-info": "Info",
 	"vetemplate-dialogbutton-template-title-warning": "Warning",
 	"vetemplate-dialogbutton-template-title-caution": "Warning",
