@@ -26,7 +26,7 @@ OO.inheritClass( ve.ui.SimpleTemplateInspector, ve.ui.NodeInspector );
 ve.ui.SimpleTemplateInspector.static.name = 'simpletemplateinspector';
 
 ve.ui.SimpleTemplateInspector.static.title =
-	OO.ui.deferMsg( 'visualeditor-SimpleTemplateInspector-title' );
+	OO.ui.deferMsg( 'visualeditor-simpletemplateinspector-title' );
 
 ve.ui.SimpleTemplateInspector.static.modelClasses = [ ve.dm.MWTransclusionNode ];
 

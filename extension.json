@@ -45,6 +45,7 @@
 				"ext.vetemplates.css"
 			],
 			"messages": [
+				"visualeditor-simpletemplateinspector-title",
 				"vetemplate-dialogbutton-template-title-info",
 				"vetemplate-dialogbutton-template-title-warning",
 				"vetemplate-dialogbutton-template-title-caution",
