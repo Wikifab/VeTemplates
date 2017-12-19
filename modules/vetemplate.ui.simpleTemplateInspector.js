@@ -2,6 +2,9 @@
 
 /**
  * SimpleTemplate inspector.
+ * 
+ * the inspector is the edit popup, not the first context popup which appear on clicking a node,
+ * but the one which appear by clicking on "edit" button, on the first context popup
  *
  * @class
  * @extends ve.ui.NodeInspector

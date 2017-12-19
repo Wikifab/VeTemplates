@@ -23,7 +23,11 @@ ve.ui.SimpleTemplateTool.static.deactivateOnSelect = true;
 ve.ui.toolFactory.register( ve.ui.SimpleTemplateTool );
 
 
-
+/**
+ * The command is the one executed on edit click, 
+ * (as insctructed in the SimpleTemplateContextItem )
+ * it opens the simpletemplateinspector to edit the node
+ */
 ve.ui.commandRegistry.register(
 	new ve.ui.Command(
 		'simpletemplatecommand', 'window', 'open',

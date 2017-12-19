@@ -37,6 +37,7 @@
 				"modules/vetemplate.ui.simpletemplatetool.js",
 				"modules/vetemplate.ui.simpleTemplateInspector.js",
 				"modules/vetemplate.ui.simpleTemplateAction.js",
+				"modules/ve.ui.MWTransclusionContextItem.js",
 				"modules/vetemplates.init.js"
 			],
 			"dependencies": [

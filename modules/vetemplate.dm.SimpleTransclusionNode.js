@@ -26,7 +26,7 @@ OO.inheritClass( ve.dm.SimpleTransclusionNode, ve.dm.MWTransclusionBlockNode );
 ve.dm.SimpleTransclusionNode.static.name = 'simpleTransclusion';
 //ve.dm.SimpleTransclusionNode.static.name = 'mwTransclusion';
 
-ve.dm.MWTransclusionBlockNode.static.matchTagNames = [];
+ve.dm.SimpleTransclusionNode.static.matchTagNames = [];
 
 ve.dm.SimpleTransclusionNode.static.matchRdfaTypes = [ 'mw:Transclusion' ];
 

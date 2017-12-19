@@ -41,8 +41,7 @@ OO.inheritClass( ve.ui.SimpleTemplateContextItem, ve.ui.LinearContextItem );
 //OO.inheritClass( ve.ui.SimpleTemplateContextItem, ve.ui.MWTransclusionContextItem );
 
 /* Static Properties */
-
-ve.ui.SimpleTemplateContextItem.static.name = 'transclusion';
+ve.ui.SimpleTemplateContextItem.static.name = 'SimpleTemplateContext';
 
 ve.ui.SimpleTemplateContextItem.static.icon = 'template';
 
@@ -54,7 +53,6 @@ ve.ui.SimpleTemplateContextItem.static.label =
 ve.ui.SimpleTemplateContextItem.static.modelClasses = [ ve.dm.MWTransclusionNode ];
 
 // command name is the command executed on edit click
-ve.ui.SimpleTemplateContextItem.static.commandName = 'transclusion';
 ve.ui.SimpleTemplateContextItem.static.commandName = 'simpletemplatecommand';
 //ve.ui.SimpleTemplateContextItem.static.commandName = 'comment';
 
@@ -65,7 +63,7 @@ ve.ui.SimpleTemplateContextItem.static.commandName = 'simpletemplatecommand';
  * @static
  * @inheritable
  */
-ve.ui.SimpleTemplateContextItem.static.template = null;
+ve.ui.SimpleTemplateContextItem.static.template = ['Info', 'Idea','Warning'];
 
 /* Static Methods */
 
