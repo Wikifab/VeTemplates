@@ -5,6 +5,12 @@
 
 /**
  * ContentEditable MediaWiki transclusion node.
+ * 
+ * 
+ * this represente the node object in the visual editor
+ * there is two way to create a node  : 
+ * - add a toolbar command using the template type 'simpleTransclusion' (in file vetemplate.simpletemplateregister.js)
+ * - when VE in loaded, it should create the corresponding node for existing templates ( not working yet)
  *
  * @class
  * @abstract
@@ -32,7 +38,7 @@ OO.inheritClass( ve.ce.SimpleTransclusionNode, ve.ce.MWTransclusionBlockNode);
 ve.ce.SimpleTransclusionNode.static.name = 'simpleTransclusion'; 
 
 // to change to get an other command : 
-ve.ce.SimpleTransclusionNode.static.primaryCommandName = 'transclusion';
+ve.ce.SimpleTransclusionNode.static.primaryCommandName = 'simpletemplatecommand';
 
 
 /**
