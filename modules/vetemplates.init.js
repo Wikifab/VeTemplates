@@ -1,4 +1,4 @@
 
-vetemplate.simpleTemplateRegister.registerTemplate('Info');
-vetemplate.simpleTemplateRegister.registerTemplate('Warning');
-vetemplate.simpleTemplateRegister.registerTemplate('Idea');
+vetemplate.simpleTemplateRegister.registerTemplate('Info', 'info');
+vetemplate.simpleTemplateRegister.registerTemplate('Warning', 'alert');
+vetemplate.simpleTemplateRegister.registerTemplate('Idea', 'comment');

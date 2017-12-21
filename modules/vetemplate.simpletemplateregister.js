@@ -2,7 +2,7 @@
 
 vetemplate.simpleTemplateRegister = {
 		
-		registerTemplate: function(templateName) {
+		registerTemplate: function(templateName, icon = 'template') {
 			// 2 element in this array : the element opening the translcusion block, 
 			// and the one closing it (with '/' ahead)
 			var templateInfo = [ {
@@ -48,6 +48,7 @@ vetemplate.simpleTemplateRegister = {
 
 			MyToolInfo.static.name = commandName;
 			MyToolInfo.static.group = 'object';
+			MyToolInfo.static.icon = icon;
 			MyToolInfo.static.title = templateName;
 			MyToolInfo.static.commandName = commandName;
 			ve.ui.toolFactory.register( MyToolInfo );
