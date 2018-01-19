@@ -23,7 +23,7 @@
 	},
 	"ResourceModules": {
 		"ext.vetemplates.css": {
-			"style": [
+			"styles": [
 				"style/style.css"
 			]
 		},

@@ -9,5 +9,8 @@ class Hooks {
 		$wgOut->addModules( [
 				'ext.vetemplates.init'
 		] );
+		$wgOut->addModuleStyles( [
+				'ext.vetemplates.css'
+		] );
 	}
 }

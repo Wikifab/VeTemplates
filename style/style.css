@@ -1,5 +1,26 @@
 
 
-.ve-area-wrapper  div.oo-ui-popupWidget-body.oo-ui-clippableElement-clippable {
-    min-height: 9em;
+.oo-ui-icon-dont {
+  color:#FFF;
+  background-image: url('icons/dont-icon.png');
+  background-image: -o-linear-gradient(transparent, transparent), url('icons/dont-icon.png');
+}
+.oo-ui-icon-idea {
+  color:#FFF;
+  background-image: url('icons/idea-icon.png');
+  background-image: -o-linear-gradient(transparent, transparent), url('icons/idea-icon.png');
+}
+.oo-ui-icon-pin {
+  background-image: url('icons/pin-icon.png');
+  background-image: -o-linear-gradient(transparent, transparent), url('icons/info.png');
+}
+.oo-ui-tool-link .oo-ui-icon-info {
+  background-image: url('icons/info-icon.png');
+  background-image: -o-linear-gradient(transparent, transparent), url('icons/info-icon.png');
+}
+.oo-ui-icon-caution {
+  background-image: url('icons/caution-icon.png');
+  background-image: -webkit-linear-gradient(transparent, transparent), /* @embed */ url('icons/caution-icon.svg');
+  background-image: linear-gradient(transparent, transparent), /* @embed */ url('icons/caution-icon.svg');
+  background-image: -o-linear-gradient(transparent, transparent), url('icons/caution-icon.png');
 }
