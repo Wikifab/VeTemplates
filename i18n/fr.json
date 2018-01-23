@@ -6,8 +6,15 @@
     },
 	"vetemplates-desc": "ajout de templates dans Visual editor",
 	"visualeditor-simpletemplateinspector-title": "Modifier",
-	"vetemplate-dialogbutton-template-title-info": "Info",
-	"vetemplate-dialogbutton-template-title-warning": "Attention",
 	"vetemplate-dialogbutton-template-title-caution": "Attention",
-	"vetemplate-dialogbutton-template-title-dont": "À ne pas faire"
+	"vetemplate-dialogbutton-template-title-dont": "À ne pas faire",
+	"vetemplate-dialogbutton-template-title-idea": "Idée",
+	"vetemplate-dialogbutton-template-title-info": "Info",
+	"vetemplate-dialogbutton-template-title-pin": "Attention",
+	"vetemplate-dialogbutton-template-title-warning": "Attention",
+	"vetemplate-templatetitle-dont": "Interdire une action",
+	"vetemplate-templatetitle-idea": "Donner une idée",
+	"vetemplate-templatetitle-info": "Donner une information complémentaire",
+	"vetemplate-templatetitle-pin": "Inviter à la mémorisation",
+	"vetemplate-templatetitle-warning": "Prévenir d'un danger"
 }

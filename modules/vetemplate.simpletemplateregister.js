@@ -45,11 +45,13 @@ vetemplate.simpleTemplateRegister = {
 				MyToolInfo.parent.apply( this, arguments );
 			}
 			OO.inheritClass( MyToolInfo, ve.ui.MWTransclusionDialogTool );
+			
+			var templateTitle = mw.msg('vetemplate-templatetitle-' + templateName.toLowerCase());
 
 			MyToolInfo.static.name = commandName;
 			MyToolInfo.static.group = 'object';
 			MyToolInfo.static.icon = icon;
-			MyToolInfo.static.title = templateName;
+			MyToolInfo.static.title = templateTitle;
 			MyToolInfo.static.commandName = commandName;
 			ve.ui.toolFactory.register( MyToolInfo );
 			

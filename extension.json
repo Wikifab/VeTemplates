@@ -50,7 +50,14 @@
 				"vetemplate-dialogbutton-template-title-info",
 				"vetemplate-dialogbutton-template-title-warning",
 				"vetemplate-dialogbutton-template-title-caution",
-				"vetemplate-dialogbutton-template-title-dont"
+				"vetemplate-dialogbutton-template-title-dont",
+				"vetemplate-dialogbutton-template-title-idea",
+				"vetemplate-templatetitle-caution",
+				"vetemplate-templatetitle-dont",
+				"vetemplate-templatetitle-idea",
+				"vetemplate-templatetitle-info",
+				"vetemplate-templatetitle-pin",
+				"vetemplate-templatetitle-warning"
 			]
 		}
 	},
