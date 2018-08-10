@@ -53,8 +53,7 @@ ve.ui.SimpleTemplateInspector.prototype.initialize = function () {
 	// Parent method
 	ve.ui.SimpleTemplateInspector.super.prototype.initialize.call( this );
 
-	this.textWidget = new ve.ui.WhitespacePreservingTextInputWidget( {
-		multiline: true,
+	this.textWidget = new OO.ui.MultilineTextInputWidget( {
 		autosize: true
 	} );
 	this.textWidget.connect( this, { resize: 'updateSize' } );
@@ -89,7 +88,7 @@ ve.ui.SimpleTemplateInspector.prototype.getSetupProcessOld = function ( data ) {
 
 			this.commentNode = this.getSelectedNode();
 			if ( this.commentNode ) {
-				this.textWidget.setValueAndWhitespace( this.commentNode.getAttribute( 'text' ) || '' );
+				this.textWidget.setValue( this.commentNode.getAttribute( 'text' ) || '' );
 			} else {
 				this.textWidget.setWhitespace( [ ' ', ' ' ] );
 				this.getFragment().insertContent( [
@@ -116,7 +115,7 @@ ve.ui.SimpleTemplateInspector.prototype.initializeTemplateParameters = function 
 	// on recupere le nom du parametre, en réalité, il semble que c'est toujours "1"
 	var paramName = model.getParameterNames();
 	var value = model.getParameter(paramName[0]).getValue();
-	this.textWidget.setValueAndWhitespace( value );
+	this.textWidget.setValue( value );
 	// target contain the name of the template :
 	//var target = model.getTarget();
 };
@@ -244,7 +243,7 @@ ve.ui.SimpleTemplateInspector.prototype.getTeardownProcess = function ( data ) {
 			}
 
 			// Reset inspector
-			this.textWidget.setValueAndWhitespace( '' );
+			this.textWidget.setValue( '' );
 		}, this );
 };
 
