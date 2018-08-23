@@ -71,5 +71,16 @@ ve.dm.SimpleTransclusionNode.static.matchFunction = function ( node ) {
  */
 ve.dm.SimpleTransclusionNode.static.blockType = 'simpleTransclusion';
 
+/**
+ * disable slug because there are buggy 
+ * (slug are div which appair on mouse over to insert new paragraph before or after element)
+ */
+ve.dm.SimpleTransclusionNode.prototype.canHaveSlugBefore = function () {
+	return true;
+};
+
+ve.dm.SimpleTransclusionNode.prototype.canHaveSlugAfter = function () {
+	return false;
+};
 
 ve.dm.modelRegistry.register( ve.dm.SimpleTransclusionNode );
