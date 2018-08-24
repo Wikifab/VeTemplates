@@ -34,7 +34,7 @@ ve.dm.SimpleTransclusionNode.static.matchTagNames = ['div', 'p'];
 ve.dm.SimpleTransclusionNode.static.matchRdfaTypes = [ 'mw:Transclusion', 'mw:SimpleTemplate' ];
 
 
-ve.dm.SimpleTransclusionNode.static.matchTemplatesNames = ['Info', 'Idea','Warning'];
+ve.dm.SimpleTransclusionNode.static.matchTemplatesNames = ['Info', 'Idea', 'Warning', 'Dont', 'Pin'];
 
 /**
  * match function to match only element of template defined in matchTemplatesNames
