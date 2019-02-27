@@ -20,6 +20,8 @@ ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
 
 	// Properties
 	this.imageModel = null;
+	this.dataJsonModel = '';
+	this.thumbUrl = null;
 	this.pageTitle = '';
 	this.isSettingUpModel = false;
 	this.isInsertion = false;
@@ -28,6 +30,9 @@ ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
 
 	this.$element.addClass( 've-ui-mwMediaDialog' );
 	this.$element.addClass( 've-ui-pMGMediaDialog' );
+
+	// load annotatedImage librairy :
+	mw.loader.load( 'ext.imageannotator.editor');
 };
 
 /* Inheritance */
@@ -363,6 +368,9 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 */
 
+	this.$imageEditorPanelWrapper = $( '<div>' ).addClass( 've-ui-mwMediaDialog-panel-imageeditor-wrapper' );
+
+
 	var currentPanel = this.panels.getCurrentItem();
 
 	this.mediaImageAnnotationPanel = new OO.ui.PanelLayout( {
@@ -444,6 +452,125 @@ ve.ui.PMGMediaDialog.prototype.fetchThumbnail = function ( imageName, dimensions
 		} );
 };
 
+
+
+/**
+ * Build the image info panel from the information in the API.
+ * Use the metadata info if it exists.
+ * Note: Some information in the metadata object needs to be safely
+ * stripped from its html wrappers.
+ *
+ * @param {Object} imageinfo Image info
+ */
+ve.ui.MWMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
+
+	this.$imageEditorPanelWrapper.empty();
+
+	var imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
+		imageTitle = new OO.ui.LabelWidget( {
+			label: mw.Title.newFromText( imageTitleText ).getNameText()
+		} ),
+		metadata = imageinfo.extmetadata,
+		// Field configuration (in order)
+		fileType = this.getFileType( imageinfo.url );
+
+	var	$thumbContainer = $( '<div>' )
+			.css("display","none")
+			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-thumb' ),
+		$main = $( '<div>' )
+			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-main' ),
+		$image = $( '<img>' ).addClass('imageeditor-sourceimg'),
+		$editorContainer = $( '<div>' );
+
+	// Main section - title
+	$main.append(
+		imageTitle.$element
+			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-title' )
+	);
+
+
+	// Build fields containing data :
+	var imageField = $('<input type="hidden" name="VEPMGimageeditor_imgTitle">');
+	var dataField = $('<input type="hidden" name="VEPMGimageeditor_data">');
+	var $fields = $( '<div>' )
+		.addClass( 've-ui-mwMediaDialog-panel-imageeditor-editor' )
+		.append(
+				imageField, dataField, $editorContainer
+		);
+
+	// Initialize thumb container
+	$thumbContainer
+		.append( $image.prop( 'src', imageinfo.thumburl ) );
+
+	this.$editorContainer = $editorContainer;
+
+
+	this.$imageEditorPanelWrapper.append(
+		$thumbContainer,
+		$fields
+	);
+
+	// Force a scrollbar to the screen before we measure it
+	this.mediaImageAnnotationPanel.$element.css( 'overflow-y', 'scroll' );
+	windowWidth = this.mediaImageAnnotationPanel.$element.width();
+
+	// Define thumbnail size
+	// For regular images, calculate a bigger image dimensions
+	var imgWidth = windowWidth ? windowWidth : 600;
+	newDimensions = ve.dm.MWImageNode.static.resizeToBoundingBox(
+		// Original image dimensions
+		{
+			width: imageinfo.width,
+			height: imageinfo.height
+		},
+		// Bounding box -- the size of the dialog, minus padding
+		{
+			width: imgWidth,
+			//width: ext_imageAnnotator.standardWidth,
+			height: this.getBodyHeight() - 120
+		}
+	);
+
+	// Resize the image
+	$image.css( {
+		width: newDimensions.width,
+		height: newDimensions.height
+	} );
+
+	// Call for a bigger image
+	this.fetchThumbnail( imageTitleText, newDimensions )
+		.done( function ( thumburl ) {
+			if ( thumburl ) {
+				$image.prop( 'src', thumburl );
+			}
+		} );
+
+	isPortrait = newDimensions.width < ( windowWidth * 3 / 5 );
+	this.mediaImageAnnotationPanel.$element.toggleClass( 've-ui-mwMediaDialog-panel-imageinfo-portrait', isPortrait );
+	this.mediaImageAnnotationPanel.$element.append( this.$imageEditorPanelWrapper );
+	if ( isPortrait ) {
+		$info.outerWidth( Math.floor( windowWidth - $thumbContainer.outerWidth( true ) - 15 ) );
+	}
+
+	// Let the scrollbar appear naturally if it should
+	this.mediaImageAnnotationPanel.$element.css( 'overflow', '' );
+};
+
+/**
+ * Choose image info for editing
+ *
+ * @param {Object} info Image info
+ */
+ve.ui.MWMediaDialog.prototype.chooseImageInfo = function ( info ) {
+	this.$infoPanelWrapper.empty();
+	// Switch panels
+	this.selectedImageInfo = info;
+	this.switchPanels( 'imageInfo' );
+	// Build info panel
+	this.buildMediaInfoPanel( info );
+	// Build editor panel
+	this.buildImageEditorPanel( info );
+};
 
 /**
  * Handle new image being chosen.
@@ -550,13 +677,35 @@ ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
 };
 
 
+ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
+	var mediaDialog = this;
+
+	var img = this.$imageEditorPanelWrapper.find('img.imageeditor-sourceimg').first();
+
+	var thumbGenerated = function  (url) {
+		mediaDialog.thumbUrl = url;
+	}
+
+	var updateCallback = function (editor, jsondata) {
+		mediaDialog.dataJsonModel = jsondata;
+
+		editor.generateThumb(thumbGenerated);
+
+		mediaDialog.switchPanels( 'edit' );
+	}
+
+	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.dataJsonModel, updateCallback);
+
+}
+
+
 /**
  * Switch between the edit and insert/search panels
  *
  * @param {string} panel Panel name
  * @param {boolean} [stopSearchRequery] Do not re-query the API for the search panel
  */
-ve.ui.MWMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequery ) {
+ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequery ) {
 	var dialog = this;
 	switch ( panel ) {
 		case 'edit':
@@ -586,13 +735,13 @@ ve.ui.MWMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequery
 			this.search.runLayoutQueue();
 			break;
 		case 'annotate':
-			console.log('switch panel annotate');
-			this.setSize( 'larger' );
+			this.setSize( 'large' );
 			// Set the edit panel
 			// TODO ...
 			this.panels.setItem( this.mediaImageAnnotationPanel );
 			// Hide/show buttons
 			this.actions.setMode( this.selectedNode ? 'edit' : 'insert' );
+			this.startImageEditor();
 			break;
 		default:
 		case 'imageInfo':
@@ -680,7 +829,6 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 	var handler;
 
-	console.log ("get action process : " + action);
 	switch ( action ) {
 		case 'change':
 			handler = function () {

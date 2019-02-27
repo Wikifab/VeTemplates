@@ -24,3 +24,8 @@
   background-image: linear-gradient(transparent, transparent), /* @embed */ url('icons/caution-icon.svg');
   background-image: -o-linear-gradient(transparent, transparent), url('icons/caution-icon.png');
 }
+
+.ve-ui-mwMediaDialog-panel-imageeditor-editor {
+	width:600px;
+	margin:0 auto;
+}
