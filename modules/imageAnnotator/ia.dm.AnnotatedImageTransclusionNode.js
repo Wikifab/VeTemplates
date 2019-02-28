@@ -34,7 +34,7 @@ ve.dm.AnnotatedImageTransclusionNode.static.matchTagNames = ['div', 'p'];
 ve.dm.AnnotatedImageTransclusionNode.static.matchRdfaTypes = [ 'mw:Transclusion', 'mw:SimpleTemplate' ];
 
 
-ve.dm.AnnotatedImageTransclusionNode.static.matchTemplatesNames = ['annotatedImage'];
+ve.dm.AnnotatedImageTransclusionNode.static.matchTemplatesNames = ['#annotatedImage'];
 
 /**
  * match function to match only element of template defined in matchTemplatesNames
@@ -50,17 +50,17 @@ ve.dm.AnnotatedImageTransclusionNode.static.matchFunction = function ( node ) {
 	if ( ! template) {
 		return false;
 	}
-	var name = template.target && template.target.wt;
+	var name = template.target && template.target.wt;template;
 	if ( ! name) {
 		return false;
 	}
 
-	if ( this.matchTemplatesNames.indexOf(name) != -1) {
-
-		console.log('match AnnotatedImageTransclusionNode');
-		console.log(node);
-		return true
-	};
+	for (var index in this.matchTemplatesNames) {
+		if (name.startsWith(this.matchTemplatesNames[index])) {
+			console.log('match AnnotatedImageTransclusionNode');
+			return true
+		}
+	}
 	return false;
 }
 
