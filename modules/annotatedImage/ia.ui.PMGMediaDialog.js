@@ -588,7 +588,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		title = mw.Title.newFromText( imageTitleText ).getPrefixedText();
 		if ( !this.imageModel ) {
 			// Create a new image model based on default attributes
-			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes(
+			this.imageModel = ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes(
 				{
 					// Per https://www.mediawiki.org/w/?diff=931265&oldid=prev
 					href: './' + title,
@@ -683,21 +683,80 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	var img = this.$imageEditorPanelWrapper.find('img.imageeditor-sourceimg').first();
 
 	var thumbGenerated = function  (url) {
-		mediaDialog.thumbUrl = url;
+		mediaDialog.imageModel.setThumbUrl(url);
 	}
 
 	var updateCallback = function (editor, jsondata) {
-		mediaDialog.dataJsonModel = jsondata;
+		//mediaDialog.dataJsonModel = jsondata;
+		mediaDialog.imageModel.setJsonData(jsondata)
 
 		editor.generateThumb(thumbGenerated);
 
 		mediaDialog.switchPanels( 'edit' );
 	}
 
-	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.dataJsonModel, updateCallback);
+	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.imageModel.getJsonData(), updateCallback);
 
 }
 
+/**
+ * @inheritdoc
+ */
+ve.ui.MWMediaDialog.prototype.getSetupProcess = function ( data ) {
+	return ve.ui.MWMediaDialog.super.prototype.getSetupProcess.call( this, data )
+		.next( function () {
+			var
+				dialog = this,
+				pageTitle = mw.config.get( 'wgTitle' ),
+				namespace = mw.config.get( 'wgNamespaceNumber' ),
+				namespacesWithSubpages = mw.config.get( 'wgVisualEditorConfig' ).namespacesWithSubpages;
+
+			// Read the page title
+			if ( namespacesWithSubpages[ namespace ] ) {
+				// If we are in a namespace that allows for subpages, strip the entire
+				// title except for the part after the last /
+				pageTitle = pageTitle.slice( pageTitle.lastIndexOf( '/' ) + 1 );
+			}
+			this.pageTitle = pageTitle;
+
+			// Set language for search results
+			this.search.setLang( this.getFragment().getDocument().getLang() );
+
+			if ( this.selectedNode ) {
+				this.isInsertion = false;
+				// Create image model
+				this.imageModel = ve.dm.PMGAnnotatedImageModel.static.newFromImageNode( this.selectedNode );
+				this.attachImageModel();
+
+				if ( !this.imageModel.isDefaultSize() ) {
+					// To avoid dirty diff in case where only the image changes,
+					// we will store the initial bounding box, in case the image
+					// is not defaultSize
+					this.imageModel.setBoundingBox( this.imageModel.getCurrentDimensions() );
+				}
+				// Store initial hash to compare against
+				this.imageModel.storeInitialHash( this.imageModel.getHashObject() );
+			} else {
+				this.isInsertion = true;
+			}
+
+			this.search.setup();
+
+			this.resetCaption();
+
+			// Reset upload booklet
+			// The first time this is called, it will try to switch panels,
+			// so the this.switchPanels() call has to be later.
+			return this.mediaUploadBooklet.initialize().then( function () {
+				dialog.actions.setAbilities( { upload: false, save: false, insert: false, apply: false } );
+
+				if ( data.file ) {
+					dialog.searchTabs.setTabPanel( 'upload' );
+					dialog.mediaUploadBooklet.setFile( data.file );
+				}
+			} );
+		}, this );
+};
 
 /**
  * Switch between the edit and insert/search panels

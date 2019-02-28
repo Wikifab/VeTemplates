@@ -56,6 +56,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.matchFunction = function ( node ) {
 	}
 
 	if ( this.matchTemplatesNames.indexOf(name) != -1) {
+
+		console.log('match AnnotatedImageTransclusionNode');
+		console.log(node);
 		return true
 	};
 	return false;

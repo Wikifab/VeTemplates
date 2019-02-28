@@ -34,7 +34,7 @@ OO.inheritClass( ve.ce.AnnotatedImageTransclusionNode, ve.ce.MWTransclusionBlock
 
 /* Static Properties */
 
-// replace mwTransclusion by simpleTransclusion
+// replace mwTransclusion by annotatedImageTransclusion
 ve.ce.AnnotatedImageTransclusionNode.static.name = 'annotatedImageTransclusion';
 
 // to change to get an other command :

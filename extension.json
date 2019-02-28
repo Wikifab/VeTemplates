@@ -38,6 +38,7 @@
 				"modules/vetemplate.ui.simpleTemplateInspector.js",
 				"modules/vetemplate.ui.simpleTemplateAction.js",
 				"modules/ve.ui.MWTransclusionContextItem.js",
+				"modules/annotatedImage/ia.dm.PMGAnnotatedImageModel.js",
 				"modules/annotatedImage/ia.ui.PMGMediaDialog.js",
 				"modules/annotatedImage/ia.ui.PMGMediaDialogTool.js",
 				"modules/imageAnnotator/ia.ce.AnnotatedImageTransclusionNode.js",
