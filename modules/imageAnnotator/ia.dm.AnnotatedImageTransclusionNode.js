@@ -50,14 +50,13 @@ ve.dm.AnnotatedImageTransclusionNode.static.matchFunction = function ( node ) {
 	if ( ! template) {
 		return false;
 	}
-	var name = template.target && template.target.wt;template;
+	var name = template.target && template.target.wt;
 	if ( ! name) {
 		return false;
 	}
 
 	for (var index in this.matchTemplatesNames) {
 		if (name.startsWith(this.matchTemplatesNames[index])) {
-			console.log('match AnnotatedImageTransclusionNode');
 			return true
 		}
 	}

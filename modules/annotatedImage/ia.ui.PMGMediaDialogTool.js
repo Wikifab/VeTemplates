@@ -26,7 +26,7 @@ ve.ui.PMGMediaDialogTool.static.group = 'object';
 ve.ui.PMGMediaDialogTool.static.icon = 'image';
 ve.ui.PMGMediaDialogTool.static.title =
 	OO.ui.deferMsg( 'visualeditor-dialogbutton-media-tooltip' );
-ve.ui.PMGMediaDialogTool.static.modelClasses = [ ve.dm.MWBlockImageNode, ve.dm.MWInlineImageNode ];
+ve.ui.PMGMediaDialogTool.static.modelClasses = [ ve.dm.PMGAnnotatedImageModel, ve.dm.AnnotatedImageTransclusionNode, ve.dm.MWBlockImageNode, ve.dm.MWInlineImageNode ];
 ve.ui.PMGMediaDialogTool.static.commandName = 'mediapmg';
 ve.ui.PMGMediaDialogTool.static.autoAddToCatchall = false;
 ve.ui.PMGMediaDialogTool.static.autoAddToGroup = false;

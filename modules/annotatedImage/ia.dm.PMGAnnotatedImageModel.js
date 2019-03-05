@@ -6,6 +6,8 @@
 /**
  * MediaWiki annotated image model.
  *
+ * Extends MWImageModel to add data for annotation and crop.
+ *
  * @class
  * @mixins OO.EventEmitter
  *
@@ -20,6 +22,10 @@
 ve.dm.PMGAnnotatedImageModel = function VeDmPMGAnnotatedImageModel( parentDoc, config ) {
 
 
+	// Mixin constructors
+	ve.dm.MWImageNode.call( this );
+	ve.dm.ClassAttributeNode.call( this );
+
 	ve.dm.PMGAnnotatedImageModel.super.call( this, parentDoc, config );
 
 	// properties concerning annotated Images
@@ -31,7 +37,18 @@ ve.dm.PMGAnnotatedImageModel = function VeDmPMGAnnotatedImageModel( parentDoc, c
 /* Inheritance */
 
 //OO.mixinClass( ve.dm.MWImageModel, OO.EventEmitter );
-OO.inheritClass( ve.dm.PMGAnnotatedImageModel, ve.dm.MWImageModel );
+//OO.inheritClass( ve.dm.PMGAnnotatedImageModel, ve.dm.MWImageModel );
+OO.inheritClass( ve.dm.PMGAnnotatedImageModel, ve.dm.MWBlockImageNode );
+
+//Need to mixin base class as well (T92540)
+OO.mixinClass( ve.dm.PMGAnnotatedImageModel, ve.dm.GeneratedContentNode );
+
+OO.mixinClass( ve.dm.PMGAnnotatedImageModel, ve.dm.MWImageNode );
+
+OO.mixinClass( ve.dm.PMGAnnotatedImageModel, ve.dm.ClassAttributeNode );
+
+
+ve.dm.PMGAnnotatedImageModel.static.name = 'pmgBlockImage';
 
 /* Events */
 
@@ -119,38 +136,58 @@ ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes = function ( attrs, p
 		}
 	);
 
+	console.log("newFromImageAttributes");
+	console.log(imgModel instanceof ve.dm.MWBlockImageNode);
+	console.log(imgModel instanceof ve.dm.GeneratedContentNode);
+	console.log(imgModel instanceof ve.dm.MWImageNode);
+	console.log(imgModel instanceof ve.dm.ClassAttributeNode);
+
+
 	// Cache the attributes so we can create a new image without
 	// losing any existing information
-	imgModel.cacheOriginalImageAttributes( attrs );
+	ve.dm.MWImageModel.prototype.cacheOriginalImageAttributes.call(imgModel, attrs);
+	//imgModel.cacheOriginalImageAttributes( attrs );
 
-	imgModel.setImageSource( attrs.src );
-	imgModel.setFilename( new mw.Title( ve.normalizeParsoidResourceName( attrs.resource ) ).getMainText() );
-	imgModel.setImageHref( attrs.href );
+	ve.dm.MWImageModel.prototype.setImageSource.call(imgModel, attrs.src);
+	//imgModel.setImageSource( attrs.src );
+	ve.dm.MWImageModel.prototype.setFilename.call(imgModel, new mw.Title( ve.normalizeParsoidResourceName( attrs.resource )));
+	//imgModel.setFilename( new mw.Title( ve.normalizeParsoidResourceName( attrs.resource ) ).getMainText() );
+	ve.dm.MWImageModel.prototype.setImageHref.call(imgModel, attrs.href);
+	//imgModel.setImageHref( attrs.href );
 
 	// Set bounding box
-	imgModel.setBoundingBox( {
+	ve.dm.MWImageModel.prototype.setBoundingBox.call(imgModel, {
+	//imgModel.setBoundingBox( {
 		width: attrs.width,
 		height: attrs.height
 	} );
 
 	// Collect all the information
-	imgModel.toggleBorder( !!attrs.borderImage );
-	imgModel.setAltText( attrs.alt || '' );
+	ve.dm.MWImageModel.prototype.toggleBorder.call(imgModel, !!attrs.borderImage);
+	ve.dm.MWImageModel.prototype.setAltText.call(imgModel, attrs.alt || '');
+	ve.dm.MWImageModel.prototype.setType.call(imgModel, attrs.type);
 
-	imgModel.setType( attrs.type );
+	// Collect all the information
+	//imgModel.toggleBorder( !!attrs.borderImage );
+	//imgModel.setAltText( attrs.alt || '' );
+	//imgModel.setType( attrs.type );
 
 	// Fix cases where alignment is undefined
 	// Inline images have no 'align' (they have 'valign' instead)
 	// But we do want an alignment case for these in case they
 	// are transformed to block images
-	imgModel.setAlignment( attrs.align || 'default' );
+	ve.dm.MWImageModel.prototype.setAlignment.call(imgModel, attrs.align || 'default');
+	//imgModel.setAlignment( attrs.align || 'default' );
 
 	// Default size
-	imgModel.toggleDefaultSize( !!attrs.defaultSize );
+	ve.dm.MWImageModel.prototype.toggleDefaultSize.call(imgModel, !!attrs.defaultSize);
+	//imgModel.toggleDefaultSize( !!attrs.defaultSize );
+
 
 	// TODO: When scale/upright is available, set the size
 	// type accordingly
-	imgModel.setSizeType( imgModel.isDefaultSize() ? 'default' : 'custom' );
+	ve.dm.MWImageModel.prototype.setSizeType.call(imgModel, imgModel.isDefaultSize() ? 'default' : 'custom');
+	//imgModel.setSizeType( imgModel.isDefaultSize() ? 'default' : 'custom' );
 
 	if (attrs.jsonData) {
 
@@ -177,6 +214,10 @@ ve.dm.PMGAnnotatedImageModel.static.newFromImageNode = function ( node ) {
  * @return {Object} Hash object
  */
 ve.dm.PMGAnnotatedImageModel.prototype.getHashObject = function () {
+
+	var hash = ve.dm.MWImageModel.prototype.getHashObject.call(this);
+
+	/*
 	var hash = {
 		filename: this.getFilename(),
 		altText: this.getAltText(),
@@ -192,10 +233,12 @@ ve.dm.PMGAnnotatedImageModel.prototype.getHashObject = function () {
 			currentDimensions: ve.copy( this.getScalable().getCurrentDimensions() ),
 			isDefault: this.getScalable().isDefault()
 		};
-	}
+	}*/
 	if ( this.getJsonData() ) {
 		hash.jsonData = this.getJsonData();
 	}
+	console.log("PMGAnnotatedImageModel.prototype.getHashObject");
+	console.log(hash);
 	return hash;
 };
 
@@ -210,6 +253,7 @@ ve.dm.PMGAnnotatedImageModel.prototype.getHashObject = function () {
  * @param {string} [align] Optional. Image alignment.
  * @return {string} Node type 'mwInlineImage' or 'mwBlockImage'
  */
+/*
 ve.dm.PMGAnnotatedImageModel.prototype.getImageNodeType = function ( imageType, align ) {
 	imageType = imageType || this.getType();
 
@@ -221,7 +265,7 @@ ve.dm.PMGAnnotatedImageModel.prototype.getImageNodeType = function ( imageType, 
 	} else {
 		return 'mwBlockImage';
 	}
-};
+};*/
 
 
 /**
@@ -296,6 +340,7 @@ ve.dm.PMGAnnotatedImageModel.prototype.insertImageNode = function ( fragment ) {
 		return fragment;
 	}
 
+
 	selectedNode = fragment.getSelectedNode();
 
 	// If there was a previous node, remove it first
@@ -304,7 +349,28 @@ ve.dm.PMGAnnotatedImageModel.prototype.insertImageNode = function ( fragment ) {
 		fragment.removeContent();
 	}
 
+	console.log("PMGAnnotatedImageModel.insertImageNode");
+
+	var hasAnnotation = this.jsonData != '';
+	if(hasAnnotation) {
+		console.log("insert annotated Image");
+	} else {
+		console.log("insert simple image");
+	}
+	console.log(nodeType);
+	console.log("old node type : " + (selectedNode ? selectedNode.type : 'none'));
+	// if image has annotation, imageType is still 'mwInlineImage' or 'mwBlockImage'
+	// but it must be inserted into a annotatedImageContainer, and image src must be changed
+
+
 	contentToInsert = this.getData();
+
+	if ( hasAnnotation) {
+
+		// If converting from a block image, create a wrapper paragraph for the inline image to go in.
+	//	fragment.insertContent( [ { type: 'div',attributes:{class:'iaAnnotatedThumb'}, internal: { generated: 'wrapper' }}, { type: '/div' } ] );
+	}
+	console.log(contentToInsert);
 
 	switch ( nodeType ) {
 		case 'mwInlineImage':
@@ -320,7 +386,7 @@ ve.dm.PMGAnnotatedImageModel.prototype.insertImageNode = function ( fragment ) {
 				fragment = fragment.clone( new ve.dm.LinearSelection( fragment.getDocument(), new ve.Range( offset ) ) );
 			}
 			fragment.insertContent( contentToInsert );
-			return fragment;
+			break;
 
 		case 'mwBlockImage':
 			// Try to put the image in front of the structural node
@@ -341,11 +407,12 @@ ve.dm.PMGAnnotatedImageModel.prototype.insertImageNode = function ( fragment ) {
 					)
 				);
 			}
-			return fragment;
+			break;
 
 		default:
 			throw new Error( 'Unknown image node type ' + nodeType );
 	}
+	return fragment;
 };
 
 /**
@@ -354,32 +421,33 @@ ve.dm.PMGAnnotatedImageModel.prototype.insertImageNode = function ( fragment ) {
  * @return {Array} Linear data
  */
 ve.dm.PMGAnnotatedImageModel.prototype.getData = function () {
-	var data,
-		originalAttrs = ve.copy( this.getOriginalImageAttributes() ),
-		editAttributes = $.extend( originalAttrs, this.getUpdatedAttributes() ),
-		nodeType = this.getImageNodeType();
 
-	// Remove old classes
-	delete editAttributes.originalClasses;
-	delete editAttributes.unrecognizedClasses;
-	// Newly created images must have valid URLs, so remove the error attribute
-	if ( this.isChangedImageSource() ) {
-		delete editAttributes.isError;
+	var imageData = ve.dm.PMGAnnotatedImageModel.super.prototype.getData.call( this );
+	if ( ! this.jsonData) {
+		console.log('simple get Data');
+		return imageData;
 	}
+	console.log('augmented get Data');
 
-	data = [
-		{
-			type: nodeType,
-			attributes: editAttributes
-		},
-		{ type: '/' + nodeType }
-	];
 
-	if ( nodeType === 'mwBlockImage' ) {
-		data.splice( 1, 0, { type: 'mwImageCaption' }, { type: '/mwImageCaption' } );
-	}
-	return data;
+	/*imageData.unshift({
+			type: 'div',
+			attributes: {'jsondata': this.jsondata, 'class': 'iaImageContainer'}
+		});
+	imageData.push(
+		{ type: '/div' }
+	);*/
+	imageData.unshift({
+			type: 'pmgBlockImage',
+			attributes: {'jsondata': this.jsondata}
+		});
+	imageData.push(
+		{ type: '/pmgBlockImage' }
+	);
+
+	return imageData;
 };
+
 
 /**
  * Return all updated attributes that belong to the node.
@@ -465,6 +533,24 @@ ve.dm.PMGAnnotatedImageModel.prototype.getThumbUrl = function ( ) {
 	return this.thumbUrl ;
 };
 
+/**
+ * return true if there is changes on image annotations
+ *
+ * @return {string} thumbUrl
+ */
+ve.dm.PMGAnnotatedImageModel.prototype.hasAnnotationChanges = function ( ) {
+	if (this.initialHash.jsonData == undefined || this.initialHash.jsonData == '') {
+		if ( this.jsonData != '' ) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return this.jsonData != this.initialHash.jsonData;
+	}
+};
+
+
 
 /**
  * Get the default alignment according to the document direction
@@ -488,3 +574,4 @@ ve.dm.PMGAnnotatedImageModel.prototype.getDefaultDir = function ( imageNodeType 
 	}
 };
 
+//ve.dm.modelRegistry.register( ve.dm.PMGAnnotatedImageModel );

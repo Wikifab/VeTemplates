@@ -8,7 +8,6 @@ vetemplate.iaTemplateRegister = {
 			var templateName = "annotatedImage"
 			// 2 element in this array : the element opening the translcusion block,
 			// and the one closing it (with '/' ahead)
-			console.log('register iatemplate');
 			var templateInfo = [ {
 				//type: 'mwTransclusionBlock',
 				type: 'annotatedImageTransclusion',

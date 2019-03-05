@@ -15,6 +15,10 @@
  * @param {Object} [config] Configuration options
  */
 ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
+
+	console.log('open dialog');
+	console.log(config);
+
 	// Parent constructor
 	ve.ui.PMGMediaDialog.super.call( this, config );
 
@@ -115,7 +119,7 @@ ve.ui.PMGMediaDialog.static.actions = [
 	}
 ];
 
-ve.ui.PMGMediaDialog.static.modelClasses = [ ve.dm.MWBlockImageNode, ve.dm.MWInlineImageNode ];
+ve.ui.PMGMediaDialog.static.modelClasses = [ ve.dm.AnnotatedImageTransclusionNode, ve.dm.MWBlockImageNode, ve.dm.MWInlineImageNode ];
 
 
 
@@ -384,6 +388,9 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 	}
 	this.panels.setItem(currentPanel);
 
+
+	console.log('initDialog');
+	console.log(this.image);
 };
 
 /**
@@ -466,6 +473,22 @@ ve.ui.MWMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 
 	this.$imageEditorPanelWrapper.empty();
 
+	// hack : if no image info, we build one :
+	// (case when editing an existing image)
+	if (! imageinfo) {
+		imageinfo = {};
+		imageinfo.title = this.imageModel.getFilename();
+		imageinfo.extmetadata = '';
+		imageinfo.url = this.imageModel.imageSrc;
+		imageinfo.thumburl = this.imageModel.imageSrc;
+		imageinfo.width = this.imageModel.getCurrentDimensions().width;
+		imageinfo.height = this.imageModel.getCurrentDimensions().height;
+	}
+
+	console.log('buildImageEditorPanel');
+	console.log(this.imageModel);
+	console.log(imageinfo);
+
 	var imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
 		imageTitle = new OO.ui.LabelWidget( {
 			label: mw.Title.newFromText( imageTitleText ).getNameText()
@@ -502,6 +525,8 @@ ve.ui.MWMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 	$thumbContainer
 		.append( $image.prop( 'src', imageinfo.thumburl ) );
 
+	console.log('buildImageEditorPanel $editorContainer');
+	console.log($editorContainer);
 	this.$editorContainer = $editorContainer;
 
 
@@ -692,8 +717,11 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 
 		editor.generateThumb(thumbGenerated);
 
+		mediaDialog.checkChanged();
 		mediaDialog.switchPanels( 'edit' );
 	}
+
+	console.log(this.$editorContainer);
 
 	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.imageModel.getJsonData(), updateCallback);
 
@@ -702,7 +730,10 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 /**
  * @inheritdoc
  */
-ve.ui.MWMediaDialog.prototype.getSetupProcess = function ( data ) {
+ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
+
+	console.log('PMGMediaDialog.prototype.getSetupProcess1');
+	console.log(data);
 	return ve.ui.MWMediaDialog.super.prototype.getSetupProcess.call( this, data )
 		.next( function () {
 			var
@@ -722,7 +753,26 @@ ve.ui.MWMediaDialog.prototype.getSetupProcess = function ( data ) {
 			// Set language for search results
 			this.search.setLang( this.getFragment().getDocument().getLang() );
 
+			console.log('PMGMediaDialog.prototype.getSetupProcess');
+			console.log(this.selectedNode);
+
+			var fragment = this.getFragment();
+			console.log(fragment.getLeafNodes() );
+
+
 			if ( this.selectedNode ) {
+				// TODO : selected Node is the dm annotatedImageTransclusion, we must find the image included
+
+				var children = this.selectedNode.getChildren();
+				var imageNode = false;
+				children.forEach(function (node) {
+					if ( ! imageNode && node instanceof ve.dm.MWBlockImageNode || node instanceof ve.dm.MWInlineImageNode) {
+						imageNode = node;
+					}
+				});
+
+				console.log(imageNode);
+
 				this.isInsertion = false;
 				// Create image model
 				this.imageModel = ve.dm.PMGAnnotatedImageModel.static.newFromImageNode( this.selectedNode );
@@ -736,6 +786,8 @@ ve.ui.MWMediaDialog.prototype.getSetupProcess = function ( data ) {
 				}
 				// Store initial hash to compare against
 				this.imageModel.storeInitialHash( this.imageModel.getHashObject() );
+
+				this.buildImageEditorPanel()
 			} else {
 				this.isInsertion = true;
 			}
@@ -796,7 +848,6 @@ ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequer
 		case 'annotate':
 			this.setSize( 'large' );
 			// Set the edit panel
-			// TODO ...
 			this.panels.setItem( this.mediaImageAnnotationPanel );
 			// Hide/show buttons
 			this.actions.setMode( this.selectedNode ? 'edit' : 'insert' );
@@ -934,6 +985,8 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 					this.captionTarget.getSurface().getModel().getDocument()
 				);
 
+				//TODO : check if we must add a node for Annotation
+
 				if (
 					// There was an initial node
 					this.selectedNode &&
@@ -941,7 +994,8 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 					this.selectedNode.type === this.imageModel.getImageNodeType() &&
 					// And we didn't change the image itself
 					this.selectedNode.getAttribute( 'src' ) ===
-						this.imageModel.getImageSource()
+						this.imageModel.getImageSource() &&
+					! this.imageModel.hasAnnotationChanges()
 				) {
 					// We only need to update the attributes of the current node
 					this.imageModel.updateImageNode( this.selectedNode, surfaceModel );

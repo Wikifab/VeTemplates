@@ -41,6 +41,10 @@ ve.ce.AnnotatedImageTransclusionNode.static.name = 'annotatedImageTransclusion';
 ve.ce.AnnotatedImageTransclusionNode.static.primaryCommandName = 'annotatedImagecommand';
 
 
+ve.ce.AnnotatedImageTransclusionNode.prototype.hasRendering  = function () {
+	return true;
+}
+
 /**
  * @inheritdoc
  */
@@ -50,6 +54,27 @@ ve.ce.AnnotatedImageTransclusionNode.prototype.onSetup = function () {
 
 	// Render replaces this.$element with a new node so re-add classes
 	this.$element.addClass( 'vetemplate-AnnotatedImageTransclusionNode' );
+};
+
+
+/**
+ * Handle a successful response from the parser for the wikitext fragment.
+ *
+ * @param {jQuery.Deferred} deferred The Deferred object created by #generateContents
+ * @param {Object} response Response data
+ */
+ve.ce.AnnotatedImageTransclusionNode.prototype.onParseSuccess = function ( deferred, response ) {
+	var contentNodes;
+
+	ve.ce.AnnotatedImageTransclusionNode.super.prototype.onSetup.onParseSuccess( this, arguments );
+
+	if ( ve.getProp( response, 'visualeditor', 'result' ) == 'success' ) {
+		console.log("AnnotatedImageTransclusionNode.onParseSuccess 2");
+		contentNodes = $.parseHTML( response.visualeditor.content, this.model && this.getModelHtmlDocument() ) || [];
+		//deferred.resolve( this.constructor.static.filterRendering( contentNodes ) );
+		console.log(contentNodes);
+	}
+
 };
 
 
