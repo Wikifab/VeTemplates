@@ -66,7 +66,7 @@ ve.ce.AnnotatedImageTransclusionNode.prototype.onSetup = function () {
 ve.ce.AnnotatedImageTransclusionNode.prototype.onParseSuccess = function ( deferred, response ) {
 	var contentNodes;
 
-	ve.ce.AnnotatedImageTransclusionNode.super.prototype.onSetup.onParseSuccess( this, arguments );
+	ve.ce.AnnotatedImageTransclusionNode.super.prototype.onParseSuccess( this, deferred, response );
 
 	if ( ve.getProp( response, 'visualeditor', 'result' ) == 'success' ) {
 		console.log("AnnotatedImageTransclusionNode.onParseSuccess 2");

@@ -22,10 +22,12 @@
 ve.dm.PMGAnnotatedImageModel = function VeDmPMGAnnotatedImageModel( parentDoc, config ) {
 
 
+	console.log('construct VeDmPMGAnnotatedImageModel');
 	// Mixin constructors
 	ve.dm.MWImageNode.call( this );
 	ve.dm.ClassAttributeNode.call( this );
 
+	console.log('construct parent VeDmPMGAnnotatedImageModel');
 	ve.dm.PMGAnnotatedImageModel.super.call( this, parentDoc, config );
 
 	// properties concerning annotated Images
@@ -124,6 +126,8 @@ ve.dm.PMGAnnotatedImageModel.static.createImageNode = function ( attributes, ima
  * @return {ve.dm.PMGAnnotatedImageModel} Image model
  */
 ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes = function ( attrs, parentDoc ) {
+
+
 	var imgModel = new ve.dm.PMGAnnotatedImageModel(
 		parentDoc,
 		{
@@ -194,6 +198,20 @@ ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes = function ( attrs, p
 	}
 
 	return imgModel;
+};
+/**
+ * Load from existing annotated image node.
+ *
+ * @param {ve.dm.AnnotatedImageTransclusionNode} node Image node
+ * @return {ve.dm.PMGAnnotatedImageModel} Image model
+ */
+ve.dm.PMGAnnotatedImageModel.static.newFromAnnotationTransclusionNode = function ( node ) {
+	console.log("newFromAnnotationTransclusionNode");
+
+	console.log(node);
+	console.log(node.getAttributes());
+
+	return ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes( node.getAttributes(), node.getDocument() );
 };
 
 /**

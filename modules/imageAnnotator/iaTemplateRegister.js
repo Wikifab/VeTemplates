@@ -53,6 +53,9 @@ vetemplate.iaTemplateRegister = {
 
 			var templateTitle = mw.msg('vetemplate-templatetitle-' + templateName.toLowerCase());
 
+			// to call the command defined above :
+			MyToolInfo.static.name = commandName;
+			// to call imagaannotation context :
 			MyToolInfo.static.name = commandName;
 			MyToolInfo.static.group = 'object';
 			MyToolInfo.static.icon = icon;

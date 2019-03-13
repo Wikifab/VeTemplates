@@ -34,7 +34,7 @@ ve.dm.AnnotatedImageContainerNode.static.matchTagNames = ['div', 'p'];
 ve.dm.AnnotatedImageContainerNode.static.matchRdfaTypes = [ 'mw:Transclusion', 'mw:SimpleTemplate' ];
 
 
-ve.dm.AnnotatedImageContainerNode.static.matchTemplatesNames = ['#annotatedImage'];
+ve.dm.AnnotatedImageContainerNode.static.matchTemplatesNames = ['#annotatttedImage'];
 
 /**
  * match function to match only element of template defined in matchTemplatesNames
@@ -57,6 +57,9 @@ ve.dm.AnnotatedImageContainerNode.static.matchFunction = function ( node ) {
 
 	for (var index in this.matchTemplatesNames) {
 		if (name.startsWith(this.matchTemplatesNames[index])) {
+			console.log('match template annotated image');
+			console.log(attr);
+			console.log(node);
 			return true
 		}
 	}

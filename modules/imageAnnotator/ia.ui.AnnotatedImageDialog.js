@@ -1,12 +1,10 @@
 /*!
- * VisualEditor user interface PMGMediaDialog class.
+ * VisualEditor user interface AnnotatedMediaDialog class.
  *
- * @copyright 2011-2018 VisualEditor Team and others; see AUTHORS.txt
- * @license The MIT License (MIT); see LICENSE.txt
  */
 
 /**
- * Dialog for inserting and editing MediaWiki media.
+ * Dialog for inserting and editing image.
  *
  * @class
  * @extends ve.ui.NodeDialog
@@ -14,48 +12,35 @@
  * @constructor
  * @param {Object} [config] Configuration options
  */
-ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
-
-	console.log('open dialog');
-	console.log(config);
-
+ve.ui.AnnotatedImageDialog = function VeUiAnnotatedImageDialog( config ) {
 	// Parent constructor
-	ve.ui.PMGMediaDialog.super.call( this, config );
+	ve.ui.AnnotatedImageDialog.super.call( this, config );
 
 	// Properties
 	this.imageModel = null;
-	this.sourceImage = '';
-	this.dataJsonModel = '';
-	this.thumbUrl = null;
 	this.pageTitle = '';
 	this.isSettingUpModel = false;
 	this.isInsertion = false;
 	this.selectedImageInfo = null;
 	this.searchCache = {};
-	this.jsonDataHasBeenModified = false;
 
 	this.$element.addClass( 've-ui-mwMediaDialog' );
-	this.$element.addClass( 've-ui-pMGMediaDialog' );
-
-	// load annotatedImage librairy :
-	mw.loader.load( 'ext.imageannotator.editor');
 };
 
 /* Inheritance */
 
-//OO.inheritClass( ve.ui.PMGMediaDialog, ve.ui.NodeDialog );
-OO.inheritClass( ve.ui.PMGMediaDialog, ve.ui.MWMediaDialog );
+OO.inheritClass( ve.ui.AnnotatedImageDialog, ve.ui.NodeDialog );
 
 /* Static Properties */
 
-ve.ui.PMGMediaDialog.static.name = 'media-dialog';
+ve.ui.AnnotatedImageDialog.static.name = 'annotatedimage';
 
-ve.ui.PMGMediaDialog.static.title =
-	OO.ui.deferMsg( 'visualeditor-dialog-media-title' );
+ve.ui.AnnotatedImageDialog.static.title =
+	OO.ui.deferMsg( 'visualeditor-dialog-annotatedimage-title' );
 
-ve.ui.PMGMediaDialog.static.size = 'large';
+ve.ui.AnnotatedImageDialog.static.size = 'large';
 
-ve.ui.PMGMediaDialog.static.actions = [
+ve.ui.AnnotatedImageDialog.static.actions = [
 	{
 		action: 'apply',
 		label: OO.ui.deferMsg( 'visualeditor-dialog-action-apply' ),
@@ -113,53 +98,84 @@ ve.ui.PMGMediaDialog.static.actions = [
 		label: OO.ui.deferMsg( 'visualeditor-dialog-media-goback' ),
 		flags: [ 'safe', 'back' ],
 		modes: [ 'change' ]
-	},
-	{
-		action: 'annotate',
-		label: OO.ui.deferMsg( 'vetemplate-dialog-media-edit-image' ),
-		modes: [ 'edit', 'insert' ]
 	}
 ];
 
-ve.ui.PMGMediaDialog.static.modelClasses = [ ve.dm.AnnotatedImageTransclusionNode, ve.dm.MWBlockImageNode, ve.dm.MWInlineImageNode ];
+ve.ui.AnnotatedImageDialog.static.modelClasses = [ ve.dm.AnnotatedImageTransclusionNode ];
 
+ve.ui.AnnotatedImageDialog.static.includeCommands = null;
 
+ve.ui.AnnotatedImageDialog.static.excludeCommands = [
+	// No formatting
+	'paragraph',
+	'heading1',
+	'heading2',
+	'heading3',
+	'heading4',
+	'heading5',
+	'heading6',
+	'preformatted',
+	'blockquote',
+	// TODO: Decide if tables tools should be allowed
+	'tableCellHeader',
+	'tableCellData',
+	// No structure
+	'bullet',
+	'bulletWrapOnce',
+	'number',
+	'numberWrapOnce',
+	'indent',
+	'outdent'
+];
+
+/**
+ * Get the import rules for the surface widget in the dialog
+ *
+ * @see ve.dm.ElementLinearData#sanitize
+ * @return {Object} Import rules
+ */
+ve.ui.AnnotatedImageDialog.static.getImportRules = function () {
+	return ve.extendObject(
+		ve.copy( ve.init.target.constructor.static.importRules ),
+		{
+			all: {
+				blacklist: OO.simpleArrayUnion(
+					ve.getProp( ve.init.target.constructor.static.importRules, 'all', 'blacklist' ) || [],
+					[
+						// Tables (but not lists) are possible in wikitext with a leading
+						// line break but we prevent creating these with the UI
+						'list', 'listItem', 'definitionList', 'definitionListItem',
+						'table', 'tableCaption', 'tableSection', 'tableRow', 'tableCell'
+					]
+				),
+				// Headings are also possible, but discouraged
+				conversions: {
+					mwHeading: 'paragraph'
+				}
+			}
+		}
+	);
+};
 
 /* Methods */
 
 /**
  * @inheritdoc
  */
-ve.ui.PMGMediaDialog.prototype.getBodyHeight = function () {
+ve.ui.AnnotatedImageDialog.prototype.getBodyHeight = function () {
 	// FIXME: This should vary on panel.
 	return 600;
 };
 
-ve.ui.PMGMediaDialog.prototype.getJsonData = function () {
-	return this.dataJsonModel;
-}
-
-ve.ui.PMGMediaDialog.prototype.setJsonData = function (jsonData) {
-	this.dataJsonModel = jsonData;
-}
-ve.ui.PMGMediaDialog.prototype.jsonDataHasBeenModified = function () {
-	return this.jsonDataHasBeenModified;
-}
-
 /**
  * @inheritdoc
  */
-ve.ui.PMGMediaDialog.prototype.initialize = function () {
+ve.ui.AnnotatedImageDialog.prototype.initialize = function () {
 	var altTextFieldset, positionFieldset, borderField, positionField;
 
-	console.log("PMGMediaDialog.prototype.initialize");
-
 	// Parent method
-	ve.ui.PMGMediaDialog.super.prototype.initialize.call( this );
-	console.log("PMGMediaDialog.prototype.initialize parent done");
+	ve.ui.AnnotatedImageDialog.super.prototype.initialize.call( this );
 
-
-/*
 	this.panels = new OO.ui.StackLayout();
 
 	// Set up the booklet layout
@@ -386,28 +402,6 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 	] );
 
 	this.$body.append( this.panels.$element );
-
-*/
-
-	this.$imageEditorPanelWrapper = $( '<div>' ).addClass( 've-ui-mwMediaDialog-panel-imageeditor-wrapper' );
-
-
-	var currentPanel = this.panels.getCurrentItem();
-
-	this.mediaImageAnnotationPanel = new OO.ui.PanelLayout( {
-		classes: [ 've-ui-mwMediaDialog-panel-imageannotation' ],
-		scrollable: false
-	} );
-	this.panels.addItems(this.mediaImageAnnotationPanel);
-
-	if (this.mediaImageAnnotationPanel.isVisible()) {
-		this.mediaImageAnnotationPanel.toggle();
-	}
-	this.panels.setItem(currentPanel);
-
-
-	console.log('initDialog');
-	console.log(this.image);
 };
 
 /**
@@ -415,7 +409,7 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
  *
  * @param {OO.ui.TabPanelLayout} tabPanel Current tabPanel
  */
-ve.ui.PMGMediaDialog.prototype.onSearchTabsSet = function ( tabPanel ) {
+ve.ui.AnnotatedImageDialog.prototype.onSearchTabsSet = function ( tabPanel ) {
 	var name = tabPanel.getName();
 
 	this.actions.setMode( name );
@@ -432,7 +426,294 @@ ve.ui.PMGMediaDialog.prototype.onSearchTabsSet = function ( tabPanel ) {
 	}
 };
 
+/**
+ * Handle panelNameSet events from the upload stack
+ *
+ * @param {OO.ui.PageLayout} page Current page
+ */
+ve.ui.AnnotatedImageDialog.prototype.onMediaUploadBookletSet = function ( page ) {
+	this.uploadPageNameSet( page.getName() );
+};
 
+/**
+ * The upload booklet's page name has changed
+ *
+ * @param {string} pageName Page name
+ */
+ve.ui.AnnotatedImageDialog.prototype.uploadPageNameSet = function ( pageName ) {
+	var imageInfo;
+	if ( pageName === 'insert' ) {
+		imageInfo = this.mediaUploadBooklet.upload.getImageInfo();
+		this.chooseImageInfo( imageInfo );
+	} else {
+		// Hide the tabs after the first page
+		this.searchTabs.toggleMenu( pageName === 'upload' );
+
+		this.actions.setMode( 'upload-' + pageName );
+	}
+};
+
+/**
+ * Handle uploadValid events
+ *
+ * @param {boolean} isValid The panel is complete and valid
+ */
+ve.ui.AnnotatedImageDialog.prototype.onUploadValid = function ( isValid ) {
+	this.actions.setAbilities( { upload: isValid } );
+};
+
+/**
+ * Handle infoValid events
+ *
+ * @param {boolean} isValid The panel is complete and valid
+ */
+ve.ui.AnnotatedImageDialog.prototype.onInfoValid = function ( isValid ) {
+	this.actions.setAbilities( { save: isValid } );
+};
+
+/**
+ * Build the image info panel from the information in the API.
+ * Use the metadata info if it exists.
+ * Note: Some information in the metadata object needs to be safely
+ * stripped from its html wrappers.
+ *
+ * @param {Object} imageinfo Image info
+ */
+ve.ui.AnnotatedImageDialog.prototype.buildMediaInfoPanel = function ( imageinfo ) {
+	var i, newDimensions, field, isPortrait, $info, $section, windowWidth,
+		contentDirection = this.getFragment().getDocument().getDir(),
+		imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
+		imageTitle = new OO.ui.LabelWidget( {
+			label: mw.Title.newFromText( imageTitleText ).getNameText()
+		} ),
+		metadata = imageinfo.extmetadata,
+		// Field configuration (in order)
+		apiDataKeysConfig = [
+			{
+				name: 'ImageDescription',
+				value: ve.getProp( metadata, 'ImageDescription', 'value' ),
+				data: {
+					keepOriginal: true
+				},
+				view: {
+					type: 'description',
+					primary: true,
+					descriptionHeight: '5em'
+				}
+			},
+			{
+				name: 'fileDetails',
+				data: { skipProcessing: true },
+				view: { icon: 'image' }
+			},
+			{
+				name: 'LicenseShortName',
+				value: ve.getProp( metadata, 'LicenseShortName', 'value' ),
+				data: {},
+				view: {
+					href: ve.getProp( metadata, 'LicenseUrl', 'value' ),
+					icon: this.getLicenseIcon( ve.getProp( metadata, 'LicenseShortName', 'value' ) )
+				}
+			},
+			{
+				name: 'Artist',
+				value: ve.getProp( metadata, 'Artist', 'value' ),
+				data: {},
+				view: {
+					// "Artist" label
+					label: 'visualeditor-dialog-media-info-meta-artist',
+					icon: 'profile'
+				}
+			},
+			{
+				name: 'Credit',
+				value: ve.getProp( metadata, 'Credit', 'value' ),
+				data: {},
+				view: { icon: 'profile' }
+			},
+			{
+				name: 'user',
+				value: imageinfo.user,
+				data: { skipProcessing: true },
+				view: {
+					icon: 'profile',
+					// This is 'uploaded by'
+					label: 'visualeditor-dialog-media-info-artist'
+				}
+			},
+			{
+				name: 'timestamp',
+				value: imageinfo.timestamp,
+				data: {
+					ignoreCharLimit: true
+				},
+				view: {
+					icon: 'clock',
+					label: 'visualeditor-dialog-media-info-uploaded',
+					isDate: true
+				}
+			},
+			{
+				name: 'DateTimeOriginal',
+				value: ve.getProp( metadata, 'DateTimeOriginal', 'value' ),
+				data: {},
+				view: {
+					icon: 'clock',
+					label: 'visualeditor-dialog-media-info-created'
+				}
+			},
+			{
+				name: 'moreinfo',
+				value: ve.msg( 'visualeditor-dialog-media-info-moreinfo' ),
+				data: {},
+				view: {
+					icon: 'info',
+					href: imageinfo.descriptionurl
+				}
+			}
+		],
+		fields = {},
+		// Store clean API data
+		apiData = {},
+		fileType = this.getFileType( imageinfo.url ),
+		$thumbContainer = $( '<div>' )
+			.addClass( 've-ui-mwMediaDialog-panel-imageinfo-thumb' ),
+		$main = $( '<div>' )
+			.addClass( 've-ui-mwMediaDialog-panel-imageinfo-main' ),
+		$details = $( '<div>' )
+			.addClass( 've-ui-mwMediaDialog-panel-imageinfo-details' ),
+		$image = $( '<img>' );
+
+	// Main section - title
+	$main.append(
+		imageTitle.$element
+			.addClass( 've-ui-mwMediaDialog-panel-imageinfo-title' )
+	);
+
+	// Clean data from the API responses
+	for ( i = 0; i < apiDataKeysConfig.length; i++ ) {
+		field = apiDataKeysConfig[ i ].name;
+		// Skip empty fields and those that are specifically configured to be skipped
+		if ( apiDataKeysConfig[ i ].data.skipProcessing ) {
+			apiData[ field ] = apiDataKeysConfig[ i ].value;
+		} else {
+			// Store a clean information from the API.
+			if ( apiDataKeysConfig[ i ].value ) {
+				apiData[ field ] = this.cleanAPIresponse( apiDataKeysConfig[ i ].value, apiDataKeysConfig[ i ].data );
+			}
+		}
+	}
+
+	// Add sizing info for non-audio images
+	if ( imageinfo.mediatype === 'AUDIO' ) {
+		// Label this file as an audio
+		apiData.fileDetails = $( '<span>' )
+			.append( ve.msg( 'visualeditor-dialog-media-info-audiofile' ) );
+	} else {
+		// Build the display for image size and type
+		apiData.fileDetails = $( '<div>' )
+			.append(
+				$( '<span>' ).text(
+					imageinfo.width +
+					'\u00a0' +
+					ve.msg( 'visualeditor-dimensionswidget-times' ) +
+					'\u00a0' +
+					imageinfo.height +
+					ve.msg( 'visualeditor-dimensionswidget-px' )
+				),
+				$( '<span>' )
+					.addClass( 've-ui-mwMediaDialog-panel-imageinfo-separator' )
+					.text( mw.msg( 'visualeditor-dialog-media-info-separator' ) ),
+				$( '<span>' ).text( fileType )
+			);
+	}
+
+	// Attach all fields in order
+	for ( i = 0; i < apiDataKeysConfig.length; i++ ) {
+		field = apiDataKeysConfig[ i ].name;
+		if ( apiData[ field ] ) {
+			$section = apiDataKeysConfig[ i ].view.primary ? $main : $details;
+
+			fields[ field ] = new ve.ui.MWMediaInfoFieldWidget( apiData[ field ], apiDataKeysConfig[ i ].view );
+			$section.append( fields[ field ].$element );
+		}
+	}
+
+	// Build the info panel
+	$info = $( '<div>' )
+		.addClass( 've-ui-mwMediaDialog-panel-imageinfo-info' )
+		.append(
+			$main.prop( 'dir', contentDirection ),
+			$details
+		);
+
+	// Make sure all links open in a new window
+	$info.find( 'a' ).prop( 'target', '_blank' ).attr( 'rel', 'noopener' );
+
+	// Initialize thumb container
+	$thumbContainer
+		.append( $image.prop( 'src', imageinfo.thumburl ) );
+
+	this.$infoPanelWrapper.append(
+		$thumbContainer,
+		$info
+	);
+
+	// Force a scrollbar to the screen before we measure it
+	this.mediaImageInfoPanel.$element.css( 'overflow-y', 'scroll' );
+	windowWidth = this.mediaImageInfoPanel.$element.width();
+
+	// Define thumbnail size
+	if ( imageinfo.mediatype === 'AUDIO' ) {
+		// HACK: We are getting the wrong information from the
+		// API about audio files. Set their thumbnail to square
+		newDimensions = {
+			width: imageinfo.thumbwidth,
+			height: imageinfo.thumbwidth
+		};
+	} else {
+		// For regular images, calculate a bigger image dimensions
+		newDimensions = ve.dm.MWImageNode.static.resizeToBoundingBox(
+			// Original image dimensions
+			{
+				width: imageinfo.width,
+				height: imageinfo.height
+			},
+			// Bounding box -- the size of the dialog, minus padding
+			{
+				width: windowWidth,
+				height: this.getBodyHeight() - 120
+			}
+		);
+	}
+	// Resize the image
+	$image.css( {
+		width: newDimensions.width,
+		height: newDimensions.height
+	} );
+
+	// Call for a bigger image
+	this.fetchThumbnail( imageTitleText, newDimensions )
+		.done( function ( thumburl ) {
+			if ( thumburl ) {
+				$image.prop( 'src', thumburl );
+			}
+		} );
+
+	isPortrait = newDimensions.width < ( windowWidth * 3 / 5 );
+	this.mediaImageInfoPanel.$element.toggleClass( 've-ui-mwMediaDialog-panel-imageinfo-portrait', isPortrait );
+	this.mediaImageInfoPanel.$element.append( this.$infoPanelWrapper );
+	if ( isPortrait ) {
+		$info.outerWidth( Math.floor( windowWidth - $thumbContainer.outerWidth( true ) - 15 ) );
+	}
+
+	// Initialize fields
+	for ( field in fields ) {
+		fields[ field ].initialize();
+	}
+	// Let the scrollbar appear naturally if it should
+	this.mediaImageInfoPanel.$element.css( 'overflow', '' );
+};
 
 /**
  * Fetch a bigger image thumbnail from the API.
@@ -441,7 +722,7 @@ ve.ui.PMGMediaDialog.prototype.onSearchTabsSet = function ( tabPanel ) {
  * @param {Object} dimensions Image dimensions
  * @return {jQuery.Promise} Thumbnail promise that resolves with new thumb url
  */
-ve.ui.PMGMediaDialog.prototype.fetchThumbnail = function ( imageName, dimensions ) {
+ve.ui.AnnotatedImageDialog.prototype.fetchThumbnail = function ( imageName, dimensions ) {
 	var dialog = this,
 		apiObj = {
 			action: 'query',
@@ -476,128 +757,84 @@ ve.ui.PMGMediaDialog.prototype.fetchThumbnail = function ( imageName, dimensions
 		} );
 };
 
+/**
+ * Clean the API responses and return it in plaintext. If needed, truncate.
+ *
+ * @param {string} rawResponse Raw response from the API
+ * @param {Object} config Configuration options
+ * @return {string} Plaintext clean response
+ */
+ve.ui.AnnotatedImageDialog.prototype.cleanAPIresponse = function ( rawResponse, config ) {
+	var isTruncated, charLimit,
+		html = $.parseHTML( rawResponse ),
+		ellipsis = ve.msg( 'visualeditor-dialog-media-info-ellipsis' ),
+		originalText = $( '<div>' ).append( html ).text();
 
+	config = config || {};
+
+	charLimit = config.charLimit || 50;
+	isTruncated = originalText.length > charLimit;
+
+	if ( config.keepOriginal ) {
+		return html;
+	}
+
+	// Check if the string should be truncated
+	return isTruncated && !config.ignoreCharLimit ?
+		originalText.substring( 0, charLimit ) + ellipsis :
+		originalText;
+};
 
 /**
- * Build the image info panel from the information in the API.
- * Use the metadata info if it exists.
- * Note: Some information in the metadata object needs to be safely
- * stripped from its html wrappers.
+ * Get the file type from the suffix of the url
  *
- * @param {Object} imageinfo Image info
+ * @param {string} url Full file url
+ * @return {string} File type
  */
-ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
+ve.ui.AnnotatedImageDialog.prototype.getFileType = function ( url ) {
+	// TODO: Validate these types, and work with icons
+	// SVG, PNG, JPEG, GIF, TIFF, XCF;
+	// OGA, OGG, MIDI, WAV;
+	// WEBM, OGV, OGX;
+	// APNG;
+	// PDF, DJVU
+	return url.split( '.' ).pop().toUpperCase();
+};
 
-	this.$imageEditorPanelWrapper.empty();
+/**
+ * Get the proper icon for the license if it is recognized
+ * or general info icon if it is not recognized.
+ *
+ * @param {string} license License short name
+ * @return {string} Icon name
+ */
+ve.ui.AnnotatedImageDialog.prototype.getLicenseIcon = function ( license ) {
+	var normalized;
 
-	console.log("PMGMediaDialog.prototype.buildImageEditorPanel ");
-
-	// hack : if no image info, we build one :
-	// (case when editing an existing image)
-	if (! imageinfo) {
-		imageinfo = {};
-		imageinfo.title = this.imageModel.getFilename();
-		imageinfo.extmetadata = '';
-		imageinfo.url = this.imageModel.imageSrc;
-		imageinfo.thumburl = this.imageModel.imageSrc;
-		imageinfo.width = this.imageModel.getCurrentDimensions().width;
-		imageinfo.height = this.imageModel.getCurrentDimensions().height;
+	if ( !license ) {
+		return 'info';
 	}
 
-	console.log('buildImageEditorPanel');
-	console.log(this.imageModel);
-	console.log(imageinfo);
+	normalized = license.toLowerCase().replace( /[-_]/g, ' ' );
 
-	var imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
-		imageTitle = new OO.ui.LabelWidget( {
-			label: mw.Title.newFromText( imageTitleText ).getNameText()
-		} ),
-		metadata = imageinfo.extmetadata,
-		// Field configuration (in order)
-		fileType = this.getFileType( imageinfo.url );
-
-	var	$thumbContainer = $( '<div>' )
-			.css("display","none")
-			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-thumb' ),
-		$main = $( '<div>' )
-			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-main' ),
-		$image = $( '<img>' ).addClass('imageeditor-sourceimg'),
-		$editorContainer = $( '<div>' );
-
-	// Main section - title
-	$main.append(
-		imageTitle.$element
-			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-title' )
-	);
-
-
-	// Build fields containing data :
-	var imageField = $('<input type="hidden" name="VEPMGimageeditor_imgTitle">');
-	var dataField = $('<input type="hidden" name="VEPMGimageeditor_data">');
-	var $fields = $( '<div>' )
-		.addClass( 've-ui-mwMediaDialog-panel-imageeditor-editor' )
-		.append(
-				imageField, dataField, $editorContainer
-		);
-
-	// Initialize thumb container
-	$thumbContainer
-		.append( $image.prop( 'src', imageinfo.thumburl ) );
-
-	console.log('buildImageEditorPanel $editorContainer');
-	console.log($editorContainer);
-	this.$editorContainer = $editorContainer;
-
-
-	this.$imageEditorPanelWrapper.append(
-		$thumbContainer,
-		$fields
-	);
-
-	// Force a scrollbar to the screen before we measure it
-	this.mediaImageAnnotationPanel.$element.css( 'overflow-y', 'scroll' );
-	windowWidth = this.mediaImageAnnotationPanel.$element.width();
-
-	// Define thumbnail size
-	// For regular images, calculate a bigger image dimensions
-	var imgWidth = windowWidth ? windowWidth : 600;
-	newDimensions = ve.dm.MWImageNode.static.resizeToBoundingBox(
-		// Original image dimensions
-		{
-			width: imageinfo.width,
-			height: imageinfo.height
-		},
-		// Bounding box -- the size of the dialog, minus padding
-		{
-			width: imgWidth,
-			//width: ext_imageAnnotator.standardWidth,
-			height: this.getBodyHeight() - 120
-		}
-	);
-
-	// Resize the image
-	$image.css( {
-		width: newDimensions.width,
-		height: newDimensions.height
-	} );
-
-	// Call for a bigger image
-	this.fetchThumbnail( imageTitleText, newDimensions )
-		.done( function ( thumburl ) {
-			if ( thumburl ) {
-				$image.prop( 'src', thumburl );
-			}
-		} );
-
-	isPortrait = newDimensions.width < ( windowWidth * 3 / 5 );
-	this.mediaImageAnnotationPanel.$element.toggleClass( 've-ui-mwMediaDialog-panel-imageinfo-portrait', isPortrait );
-	this.mediaImageAnnotationPanel.$element.append( this.$imageEditorPanelWrapper );
-	if ( isPortrait ) {
-		$info.outerWidth( Math.floor( windowWidth - $thumbContainer.outerWidth( true ) - 15 ) );
+	// FIXME: Structured data from Commons will make this properly
+	// multilingual. For now, this is the limit of what is sensible.
+	if ( normalized.match( /^((cc )?pd|public domain)/ ) ) {
+		return 'public-domain';
+	} else if ( normalized.match( /^cc (by|sa)?/ ) ) {
+		return 'logoCC';
+	} else {
+		return 'info';
 	}
+};
 
-	// Let the scrollbar appear naturally if it should
-	this.mediaImageAnnotationPanel.$element.css( 'overflow', '' );
+/**
+ * Handle search results choose event.
+ *
+ * @param {mw.widgets.MediaResultWidget} item Chosen item
+ */
+ve.ui.AnnotatedImageDialog.prototype.onSearchResultsChoose = function ( item ) {
+	this.chooseImageInfo( item.getData() );
 };
 
 /**
@@ -605,15 +842,13 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
  *
  * @param {Object} info Image info
  */
-ve.ui.PMGMediaDialog.prototype.chooseImageInfo = function ( info ) {
+ve.ui.AnnotatedImageDialog.prototype.chooseImageInfo = function ( info ) {
 	this.$infoPanelWrapper.empty();
 	// Switch panels
 	this.selectedImageInfo = info;
 	this.switchPanels( 'imageInfo' );
 	// Build info panel
 	this.buildMediaInfoPanel( info );
-	// Build editor panel
-	this.buildImageEditorPanel( info );
 };
 
 /**
@@ -621,7 +856,7 @@ ve.ui.PMGMediaDialog.prototype.chooseImageInfo = function ( info ) {
  *
  * @param {mw.widgets.MediaResultWidget|null} item Selected item
  */
-ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
+ve.ui.AnnotatedImageDialog.prototype.confirmSelectedImage = function () {
 	var title, imageTitleText,
 		obj = {},
 		info = this.selectedImageInfo;
@@ -632,7 +867,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		title = mw.Title.newFromText( imageTitleText ).getPrefixedText();
 		if ( !this.imageModel ) {
 			// Create a new image model based on default attributes
-			this.imageModel = ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes(
+			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes(
 				{
 					// Per https://www.mediawiki.org/w/?diff=931265&oldid=prev
 					href: './' + title,
@@ -690,11 +925,132 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 	}
 };
 
+/**
+ * Handle image model alignment change
+ *
+ * @param {string} alignment Image alignment
+ */
+ve.ui.AnnotatedImageDialog.prototype.onImageModelAlignmentChange = function ( alignment ) {
+	alignment = alignment || 'none';
+
+	// Select the item without triggering the 'choose' event
+	this.positionSelect.selectItemByData( alignment !== 'none' ? alignment : undefined );
+
+	this.positionCheckbox.setSelected( alignment !== 'none' );
+	this.checkChanged();
+};
+
+/**
+ * Handle image model type change
+ *
+ * @param {string} type Image type
+ */
+ve.ui.AnnotatedImageDialog.prototype.onImageModelTypeChange = function ( type ) {
+	this.typeSelect.selectItemByData( type );
+
+	this.borderCheckbox.setDisabled(
+		!this.imageModel.isBorderable()
+	);
+
+	this.borderCheckbox.setSelected(
+		this.imageModel.isBorderable() && this.imageModel.hasBorder()
+	);
+	this.checkChanged();
+};
+
+/**
+ * Handle change event on the positionCheckbox element.
+ *
+ * @param {boolean} isSelected Checkbox status
+ */
+ve.ui.AnnotatedImageDialog.prototype.onPositionCheckboxChange = function ( isSelected ) {
+	var newPositionValue,
+		currentModelAlignment = this.imageModel.getAlignment();
+
+	this.positionSelect.setDisabled( !isSelected );
+	this.checkChanged();
+	// Only update the model if the current value is different than that
+	// of the image model
+	if (
+		( currentModelAlignment === 'none' && isSelected ) ||
+		( currentModelAlignment !== 'none' && !isSelected )
+	) {
+		if ( isSelected ) {
+			// Picking a floating alignment value will create a block image
+			// no matter what the type is, so in here we want to calculate
+			// the default alignment of a block to set as our initial alignment
+			// in case the checkbox is clicked but there was no alignment set
+			// previously.
+			newPositionValue = this.imageModel.getDefaultDir( 'mwBlockImage' );
+			this.imageModel.setAlignment( newPositionValue );
+		} else {
+			// If we're unchecking the box, always set alignment to none and unselect the position widget
+			this.imageModel.setAlignment( 'none' );
+		}
+	}
+};
+
+/**
+ * Handle change event on the positionCheckbox element.
+ *
+ * @param {boolean} isSelected Checkbox status
+ */
+ve.ui.AnnotatedImageDialog.prototype.onBorderCheckboxChange = function ( isSelected ) {
+	// Only update if the value is different than the model
+	if ( this.imageModel.hasBorder() !== isSelected ) {
+		// Update the image model
+		this.imageModel.toggleBorder( isSelected );
+		this.checkChanged();
+	}
+};
+
+/**
+ * Handle change event on the positionSelect element.
+ *
+ * @param {OO.ui.ButtonOptionWidget} item Selected item
+ */
+ve.ui.AnnotatedImageDialog.prototype.onPositionSelectChoose = function ( item ) {
+	var position = item.getData();
+
+	// Only update if the value is different than the model
+	if ( this.imageModel.getAlignment() !== position ) {
+		this.imageModel.setAlignment( position );
+		this.checkChanged();
+	}
+};
+
+/**
+ * Handle change event on the typeSelect element.
+ *
+ * @param {OO.ui.MenuOptionWidget} item Selected item
+ */
+ve.ui.AnnotatedImageDialog.prototype.onTypeSelectChoose = function ( item ) {
+	var type = item.getData();
+
+	// Only update if the value is different than the model
+	if ( this.imageModel.getType() !== type ) {
+		this.imageModel.setType( type );
+		this.checkChanged();
+	}
+
+	// If type is 'frame', disable the size input widget completely
+	this.sizeWidget.setDisabled( type === 'frame' );
+};
+
+/**
+ * Respond to change in alternate text
+ *
+ * @param {string} text New alternate text
+ */
+ve.ui.AnnotatedImageDialog.prototype.onAlternateTextChange = function ( text ) {
+	this.imageModel.setAltText( text );
+	this.checkChanged();
+};
 
 /**
  * When changes occur, enable the apply button.
  */
-ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
+ve.ui.AnnotatedImageDialog.prototype.checkChanged = function () {
 	var captionChanged = false;
 
 	// Only check 'changed' status after the model has finished
@@ -710,8 +1066,7 @@ ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
 				// Check that the model or caption changed
 				this.isInsertion && this.imageModel ||
 				captionChanged ||
-				this.imageModel.hasBeenModified() ||
-				this.jsonDataHasBeenModified
+				this.imageModel.hasBeenModified()
 			)
 		) {
 			this.actions.setAbilities( { insert: true, apply: true } );
@@ -721,80 +1076,11 @@ ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
 	}
 };
 
-
-ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
-	var mediaDialog = this;
-
-	//var img = this.$imageEditorPanelWrapper.find('img.imageeditor-sourceimg').first();
-
-	var img = $('<img src="' + this.sourceImage + '">');
-
-	var editorObject = null;
-
-	var thumbGenerated = function  (url, thumbData) {
-		// TODO : change img src attribut
-		//mediaDialog.imageModel.setThumbUrl(url);
-		console.log("thumbGenerated");
-		console.log(thumbData);
-		mediaDialog.imageModel.imageSrc = url;
-		mediaDialog.hash = thumbData.hash;
-	}
-
-	var updateCallback = function (editor, jsondata) {
-		mediaDialog.dataJsonModel = jsondata;
-		mediaDialog.setJsonData(jsondata);
-		mediaDialog.jsonDataHasBeenModified = true;
-
-		editorObject = editor;
-		editor.generateThumb(thumbGenerated);
-
-		mediaDialog.checkChanged();
-		mediaDialog.switchPanels( 'edit' );
-	}
-
-	console.log('startImageEditor');
-	console.log(img);
-	console.log(this.getJsonData());
-	console.log(this.$editorContainer);
-
-	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback);
-
-}
-
-
-/**
- * get image model from a node
- * node can be BlockImageNode or AnnotatedImageTransclusion
- */
-ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
-
-	switch(selectedNode.type) {
-		case 'annotatedImageTransclusion' :
-			this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
-			attributes = this.selectedNode.getAttributes();
-			this.setJsonData(attributes.jsondata);
-			this.sourceImage = attributes.sourceimage;
-			this.jsonDataHasBeenModified = false;
-			break;
-		case 'image' :
-			this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
-			this.setJsonData('');
-			this.jsonDataHasBeenModified = false;
-			break;
-		default :
-			console.log('PMGMediaDialog.prototype.getModelFromNode : unknown type');
-			console.log(selectedNode);
-			throw new Exception('Node type invalid');
-	}
-	return this.imageModel;
-}
-
 /**
  * @inheritdoc
  */
-ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
-
-	return ve.ui.MWMediaDialog.super.prototype.getSetupProcess.call( this, data )
+ve.ui.AnnotatedImageDialog.prototype.getSetupProcess = function ( data ) {
+	return ve.ui.AnnotatedImageDialog.super.prototype.getSetupProcess.call( this, data )
 		.next( function () {
 			var
 				dialog = this,
@@ -813,17 +1099,10 @@ ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
 			// Set language for search results
 			this.search.setLang( this.getFragment().getDocument().getLang() );
 
-
-			var fragment = this.getFragment();
-
-
 			if ( this.selectedNode ) {
-				// TODO : selected Node is the dm annotatedImageTransclusion, we must find the image included
-
-
 				this.isInsertion = false;
 				// Create image model
-				this.setModelFromNode(this.selectedNode);
+				this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
 				this.attachImageModel();
 
 				if ( !this.imageModel.isDefaultSize() ) {
@@ -834,8 +1113,6 @@ ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
 				}
 				// Store initial hash to compare against
 				this.imageModel.storeInitialHash( this.imageModel.getHashObject() );
-
-				this.buildImageEditorPanel()
 			} else {
 				this.isInsertion = true;
 			}
@@ -864,7 +1141,7 @@ ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
  * @param {string} panel Panel name
  * @param {boolean} [stopSearchRequery] Do not re-query the API for the search panel
  */
-ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequery ) {
+ve.ui.AnnotatedImageDialog.prototype.switchPanels = function ( panel, stopSearchRequery ) {
 	var dialog = this;
 	switch ( panel ) {
 		case 'edit':
@@ -893,14 +1170,6 @@ ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequer
 			// Layout pending items
 			this.search.runLayoutQueue();
 			break;
-		case 'annotate':
-			this.setSize( 'large' );
-			// Set the edit panel
-			this.panels.setItem( this.mediaImageAnnotationPanel );
-			// Hide/show buttons
-			this.actions.setMode( this.selectedNode ? 'edit' : 'insert' );
-			this.startImageEditor();
-			break;
 		default:
 		case 'imageInfo':
 			this.setSize( 'larger' );
@@ -916,7 +1185,7 @@ ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequer
 /**
  * Attach the image model to the dialog
  */
-ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
+ve.ui.AnnotatedImageDialog.prototype.attachImageModel = function () {
 	if ( this.imageModel ) {
 		this.imageModel.disconnect( this );
 		this.sizeWidget.disconnect( this );
@@ -982,148 +1251,82 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 };
 
 /**
- * return data to be inserted in VE editor
- * TODO : this function should be moved in dataModel Object
+ * Reset the caption surface
  */
-ve.ui.PMGMediaDialog.prototype.getData = function () {
+ve.ui.AnnotatedImageDialog.prototype.resetCaption = function () {
+	var captionNode, captionDocument,
+		doc = this.getFragment().getDocument();
 
-
-	console.log('PMGMediaDialog.prototype.getData ');
-	var resource = 'File:Desklamp_lasercut.jpg';
-
-	var targetWt = '#annotatedImageLight:' + resource;
-	var jsondata = this.dataJsonModel;
-	var hash = this.hash ? this.hash : '';
-
-	var data = [ {
-		type: 'annotatedImageTransclusion',
-		attributes: {
-			mw: {
-				parts: [ {
-					template: {
-						target: {
-							'function': 'annotatedImageLight',
-							wt: targetWt
-						},
-						params: {
-							hash: {
-								wt: hash
-							},
-							jsondata: {
-								wt: jsondata
-							}
-						}
-					}
-				} ]
-			}
+	// Get existing caption. We only do this in setup, because the caption
+	// should not reset to original if the image is replaced or edited.
+	//
+	// If the selected node is a block image and the caption already exists,
+	// store the initial caption and set it as the caption document
+	if (
+		this.imageModel &&
+		this.selectedNode &&
+		this.selectedNode.getDocument() &&
+		this.selectedNode instanceof ve.dm.MWBlockImageNode
+	) {
+		captionNode = this.selectedNode.getCaptionNode();
+		if ( captionNode && captionNode.getLength() > 0 ) {
+			this.imageModel.setCaptionDocument(
+				this.selectedNode.getDocument().cloneFromRange( captionNode.getRange() )
+			);
 		}
-	}, {
-		//type: '/mwTransclusionBlock'
-		type: '/annotatedImageTransclusion'
-		//type: '/simpleTransclusion',
-	} ];
-
-	return data;
-}
-
-/**
- * this function update the dom according to date in the image node
- * it should only update the changes attribute to avoid image reload
- * but to simplified, we replace all, and call insertImageNode
- *
- */
-ve.ui.PMGMediaDialog.prototype.updateAnnotatedImageNode = function ( ) {
-	var surfaceModel = this.getFragment().getSurface();
-
-	// theoritically, it should be just :
-	//this.imageModel.updateImageNode( this.selectedNode, surfaceModel );
-
-	this.insertAnnotatedImageNode();
-}
-
-/**
- * this function update/insert the dom according to date in the image node, and jsondata
- * theoritically, this should be in ve.dm.AnnotatedImageNode model, but a we use a MWImageModel,
- * the function is incorrect for annotated images
- *
- */
-ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
-
-	// theoritically, it should be just :
-	//this.fragment = this.imageModel.insertImageNode( this.getFragment() );
-
-	// TODO : do equivalent of imageModel.insertImageNode (but whit a translusion model)
-
-	var fragment = this.getFragment();
-
-
-	var captionDoc, offset, contentToInsert, selectedNode,
-	nodeType = this.imageModel.getImageNodeType(),
-	surfaceModel = fragment.getSurface();
-
-	if ( !( fragment.getSelection() instanceof ve.dm.LinearSelection ) ) {
-		return fragment;
 	}
 
-	selectedNode = fragment.getSelectedNode();
-
-	// If there was a previous node, remove it first
-	if ( selectedNode ) {
-		// Remove the old image
-		fragment.removeContent();
+	if ( this.imageModel ) {
+		captionDocument = this.imageModel.getCaptionDocument();
+	} else {
+		captionDocument = doc.cloneWithData( [
+			{ type: 'paragraph', internal: { generated: 'wrapper' } },
+			{ type: '/paragraph' },
+			{ type: 'internalList' },
+			{ type: '/internalList' }
+		] );
 	}
 
-	contentToInsert = this.getData();
-
-	console.log("insertAnnotatedImageNode");
-	console.log(contentToInsert);
-
-	switch ( nodeType ) {
-		case 'mwInlineImage':
-			if ( selectedNode && selectedNode.type === 'mwBlockImage' ) {
-				// If converting from a block image, create a wrapper paragraph for the inline image to go in.
-				fragment.insertContent( [ { type: 'paragraph', internal: { generated: 'wrapper' } }, { type: '/paragraph' } ] );
-				offset = fragment.getSelection().getRange().start + 1;
-			} else {
-				// Try to put the image inside the nearest content node
-				offset = fragment.getDocument().data.getNearestContentOffset( fragment.getSelection().getRange().start );
-			}
-			if ( offset > -1 ) {
-				fragment = fragment.clone( new ve.dm.LinearSelection( fragment.getDocument(), new ve.Range( offset ) ) );
-			}
-			fragment.insertContent( contentToInsert );
-			return fragment;
-
-		case 'mwBlockImage':
-			// Try to put the image in front of the structural node
-			offset = fragment.getDocument().data.getNearestStructuralOffset( fragment.getSelection().getRange().start, -1 );
-			if ( offset > -1 ) {
-				fragment = fragment.clone( new ve.dm.LinearSelection( fragment.getDocument(), new ve.Range( offset ) ) );
-			}
-			fragment.insertContent( contentToInsert );
-			// Check if there is caption document and insert it
-			captionDoc = this.getCaptionDocument();
-			if ( captionDoc.data.hasContent() ) {
-				// Add contents of new caption
-				surfaceModel.change(
-					ve.dm.TransactionBuilder.static.newFromDocumentInsertion(
-						surfaceModel.getDocument(),
-						fragment.getSelection().getRange().start + 2,
-						this.getCaptionDocument()
-					)
-				);
-			}
-			return fragment;
-
-		default:
-			throw new Error( 'Unknown image node type ' + nodeType );
-	}
-}
+	// Set document
+	this.captionTarget.setDocument( captionDocument );
+	this.captionTarget.initialize();
+};
 
 /**
  * @inheritdoc
  */
-ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
+ve.ui.AnnotatedImageDialog.prototype.getReadyProcess = function ( data ) {
+	return ve.ui.AnnotatedImageDialog.super.prototype.getReadyProcess.call( this, data )
+		.next( function () {
+			// #switchPanels triggers field focus, so do this in the ready process
+			this.switchPanels( this.selectedNode ? 'edit' : 'search' );
+			// Revalidate size
+			this.sizeWidget.validateDimensions();
+		}, this );
+};
+
+/**
+ * @inheritdoc
+ */
+ve.ui.AnnotatedImageDialog.prototype.getTeardownProcess = function ( data ) {
+	return ve.ui.AnnotatedImageDialog.super.prototype.getTeardownProcess.call( this, data )
+		.first( function () {
+			// Cleanup
+			this.search.getQuery().setValue( '' );
+			this.search.teardown();
+			if ( this.imageModel ) {
+				this.imageModel.disconnect( this );
+				this.sizeWidget.disconnect( this );
+			}
+			this.captionTarget.clear();
+			this.imageModel = null;
+		}, this );
+};
+
+/**
+ * @inheritdoc
+ */
+ve.ui.AnnotatedImageDialog.prototype.getActionProcess = function ( action ) {
 	var handler;
 
 	switch ( action ) {
@@ -1172,8 +1375,6 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 					this.captionTarget.getSurface().getModel().getDocument()
 				);
 
-				//TODO : check if we must add a node for Annotation
-
 				if (
 					// There was an initial node
 					this.selectedNode &&
@@ -1181,29 +1382,20 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 					this.selectedNode.type === this.imageModel.getImageNodeType() &&
 					// And we didn't change the image itself
 					this.selectedNode.getAttribute( 'src' ) ===
-						this.imageModel.getImageSource() &&
-					! this.imageModel.hasAnnotationChanges()
+						this.imageModel.getImageSource()
 				) {
 					// We only need to update the attributes of the current node
-					//this.imageModel.updateImageNode( this.selectedNode, surfaceModel );
-					this.updateAnnotatedImageNode();
+					this.imageModel.updateImageNode( this.selectedNode, surfaceModel );
 				} else {
 					// Replacing an image or inserting a brand new one
-					// TODO : if this is an annotation, we must compute the correct html
-					//this.fragment = this.imageModel.insertImageNode( this.getFragment() );
-					this.insertAnnotatedImageNode();
+					this.fragment = this.imageModel.insertImageNode( this.getFragment() );
 				}
 
 				this.close( { action: action } );
 			};
 			break;
-		case 'annotate':
-			handler = function () {
-				this.switchPanels( 'annotate', true );
-			};
-			break;
 		default:
-			return ve.ui.PMGMediaDialog.super.prototype.getActionProcess.call( this, action );
+			return ve.ui.AnnotatedImageDialog.super.prototype.getActionProcess.call( this, action );
 	}
 
 	return new OO.ui.Process( handler, this );
@@ -1211,4 +1403,4 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 
 /* Registration */
 
-ve.ui.windowFactory.register( ve.ui.PMGMediaDialog );
+ve.ui.windowFactory.register( ve.ui.AnnotatedImageDialog );

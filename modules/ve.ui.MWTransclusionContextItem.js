@@ -6,8 +6,13 @@
 
 ve.ui.MWTransclusionContextItem.static.isCompatibleWith = function ( model ) {
 
+
     var compaSimpleTemplate = ve.ui.SimpleTemplateContextItem.static.isCompatibleWith(model);
     if (compaSimpleTemplate) {
+    	return false;
+    }
+    var compaAnnotatedTemplate = ve.ui.AnnotatedImageContextItem.static.isCompatibleWith(model);
+    if (compaAnnotatedTemplate) {
     	return false;
     }
 

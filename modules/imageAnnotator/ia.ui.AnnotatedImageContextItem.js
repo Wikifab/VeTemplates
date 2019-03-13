@@ -57,6 +57,7 @@ ve.ui.AnnotatedImageContextItem.static.modelClasses = [ ve.dm.AnnotatedImageTran
 
 // command name is the command executed on edit click
 ve.ui.AnnotatedImageContextItem.static.commandName = 'mediapmg';
+//.ui.AnnotatedImageContextItem.static.commandName = 'annotatedimage';
 //ve.ui.AnnotatedImageContextItem.static.commandName = 'comment';
 
 /**
@@ -80,7 +81,8 @@ ve.ui.AnnotatedImageContextItem.static.template = ['annotatedImage', '#annotated
 ve.ui.AnnotatedImageContextItem.static.isCompatibleWith = function ( model ) {
 	var compatible;
 	// Parent method
-	compatible = ve.ui.AnnotatedImageContextItem.super.static.isCompatibleWith.call( this, model );
+	// we must not call parent (MWTransclusionContextItem.static.isCompatibleWith )  to avoid loop
+	compatible = ve.ui.FragmentWindowTool.static.isCompatibleWith.call( this, model );
 
 	if ( compatible && this.template ) {
 		if( model.type == "annotatedImageTransclusion") {
@@ -103,13 +105,8 @@ ve.ui.AnnotatedImageContextItem.prototype.getDescription = function () {
 	var selection = surfaceModel.getSelection();
 	//this.selectedNode.getAttribute( 'mw' );
 
-console.log("ve.ui.AnnotatedImageContextItem.prototype.getDescription");
 	// old description : texte including template name :
-	return ve.msg(
-		'visualeditor-dialog-annotatedImage-description',
-		ve.ce.MWTransclusionNode.static.getDescription( this.model ),
-		ve.ce.MWTransclusionNode.static.getTemplatePartDescriptions( this.model ).length
-	);
+	return ve.msg('vetemplate-dialog-annotatedImage-description');
 };
 
 

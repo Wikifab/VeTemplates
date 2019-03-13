@@ -45,6 +45,7 @@
 				"modules/annotatedImage/ia.ui.PMGMediaDialog.js",
 				"modules/annotatedImage/ia.ui.PMGMediaDialogTool.js",
 				"modules/imageAnnotator/ia.ui.AnnotatedImageContextItem.js",
+				"modules/imageAnnotator/ia.ui.AnnotatedImageDialog.js",
 				"modules/annotatedImage/ve.ui.PMGAnnnotatedMediaContextItem.js",
 				"modules/imageAnnotator/iaTemplateRegister.js",
 				"modules/vetemplates.init.js"
