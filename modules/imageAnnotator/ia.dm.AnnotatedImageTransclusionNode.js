@@ -86,6 +86,7 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 
 	var newDimensions, attributes,
 		figure, imgWrapper, img, caption,
+		divFloatWrapper = null, // optional wrapper di to add float class
 		classAttr, typeofAttrs, errorIndex, width, height, altText, types;
 
 	// Workaround for jQuery's .children() being expensive due to
@@ -98,9 +99,16 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 
 	figure = domElements[ 0 ];
 	imgWrapper = findChildren( figure, [ 'a', 'span' ] )[ 0 ] || null;
+
 	img = imgWrapper && findChildren( imgWrapper, [ 'img', 'video' ] )[ 0 ] || null;
 
-	console.log(img);
+	// if img not found, it may be in a sub div element :
+	if (! img) {
+		divFloatWrapper = imgWrapper && findChildren( imgWrapper, [ 'div' ] )[ 0 ] || null;
+		if (divFloatWrapper) {
+			img = divFloatWrapper && findChildren( divFloatWrapper, [ 'img', 'video' ] )[ 0 ] || null;
+		}
+	}
 
 	caption = findChildren( figure, [ 'figcaption' ] )[ 0 ] || null;
 	classAttr = figure.getAttribute( 'class' );
