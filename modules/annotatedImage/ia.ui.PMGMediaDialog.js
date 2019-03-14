@@ -498,8 +498,8 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 		imageinfo = {};
 		imageinfo.title = this.imageModel.getFilename();
 		imageinfo.extmetadata = '';
-		imageinfo.url = this.imageModel.imageSrc;
-		imageinfo.thumburl = this.imageModel.imageSrc;
+		imageinfo.url = this.imageModel.imageSrc ? this.imageModel.imageSrc: this.imageModel.url;
+		imageinfo.thumburl = imageinfo.url;
 		imageinfo.width = this.imageModel.getCurrentDimensions().width;
 		imageinfo.height = this.imageModel.getCurrentDimensions().height;
 	}
@@ -546,6 +546,7 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 
 	console.log('buildImageEditorPanel $editorContainer');
 	console.log($editorContainer);
+	console.log($image);
 	this.$editorContainer = $editorContainer;
 
 
@@ -632,7 +633,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		title = mw.Title.newFromText( imageTitleText ).getPrefixedText();
 		if ( !this.imageModel ) {
 			// Create a new image model based on default attributes
-			this.imageModel = ve.dm.PMGAnnotatedImageModel.static.newFromImageAttributes(
+			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes(
 				{
 					// Per https://www.mediawiki.org/w/?diff=931265&oldid=prev
 					href: './' + title,
@@ -649,6 +650,10 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 			);
 			this.attachImageModel();
 			this.resetCaption();
+
+			this.sourceImage = info.url;
+			this.dataJsonModel = '';
+			this.thumbUrl = null;
 		} else {
 			// Update the current image model with the new image source
 			this.imageModel.changeImageSource(
@@ -660,6 +665,9 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 				},
 				info
 			);
+			this.sourceImage = info.url;
+			this.dataJsonModel = '';
+			this.thumbUrl = null;
 			// Update filename
 			this.filenameFieldset.setLabel(
 				$( '<span>' ).append(
@@ -982,6 +990,13 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 };
 
 /**
+ * function to extract file name of a path
+ */
+ve.ui.PMGMediaDialog.prototype.basename = function (path) {
+   return path.split('/').reverse()[0];
+}
+
+/**
  * return data to be inserted in VE editor
  * TODO : this function should be moved in dataModel Object
  */
@@ -989,7 +1004,14 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 
 
 	console.log('PMGMediaDialog.prototype.getData ');
-	var resource = 'File:Desklamp_lasercut.jpg';
+	//var resource = 'File:Desklamp_lasercut.jpg';
+
+	var resource = '';
+	if (this.imageModel) {
+		resource = this.basename(this.imageModel.getImageResourceName());
+	}
+	console.log(resource);
+
 
 	var targetWt = '#annotatedImageLight:' + resource;
 	var jsondata = this.dataJsonModel;
@@ -1102,7 +1124,7 @@ ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
 			}
 			fragment.insertContent( contentToInsert );
 			// Check if there is caption document and insert it
-			captionDoc = this.getCaptionDocument();
+			captionDoc = this.imageModel.getCaptionDocument();
 			if ( captionDoc.data.hasContent() ) {
 				// Add contents of new caption
 				surfaceModel.change(

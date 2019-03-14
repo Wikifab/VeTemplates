@@ -5,24 +5,24 @@ vetemplate.imageAnnotator = vetemplate.imageAnnotator || {};
 vetemplate.iaTemplateRegister = {
 
 		registerTemplate: function(icon = 'media') {
-			var templateName = "annotatedImage"
-			// 2 element in this array : the element opening the translcusion block,
-			// and the one closing it (with '/' ahead)
+
+
 			var templateInfo = [ {
-				//type: 'mwTransclusionBlock',
 				type: 'annotatedImageTransclusion',
-				//type: 'simpleTransclusion',
 				attributes: {
 					mw: {
 						parts: [ {
 							template: {
 								target: {
-									href: 'Template:' + templateName,
-									wt: '#' + templateName
+									'function': 'annotatedImageLight',
+									wt: targetWt
 								},
 								params: {
-									1: {
-										wt: '...'
+									hash: {
+										wt: hash
+									},
+									jsondata: {
+										wt: jsondata
 									}
 								}
 							}
@@ -35,7 +35,8 @@ vetemplate.iaTemplateRegister = {
 				//type: '/simpleTransclusion',
 			} ];
 
-			var commandName = 'iatemplateblock';
+
+			var commandName = 'mediapmg';
 
 			ve.ui.commandRegistry.register(
 				new ve.ui.Command( commandName, 'simpletemplateaction', 'insert', {
@@ -43,26 +44,6 @@ vetemplate.iaTemplateRegister = {
 					supportedSelections: [ 'linear' ]
 				} )
 			);
-
-			//Create and register tool
-			// tools are used only to add button in the toolbar
-			function MyToolInfo() {
-				MyToolInfo.parent.apply( this, arguments );
-			}
-			OO.inheritClass( MyToolInfo, ve.ui.MWTransclusionDialogTool );
-
-			var templateTitle = mw.msg('vetemplate-templatetitle-' + templateName.toLowerCase());
-
-			// to call the command defined above :
-			MyToolInfo.static.name = commandName;
-			// to call imagaannotation context :
-			MyToolInfo.static.name = commandName;
-			MyToolInfo.static.group = 'object';
-			MyToolInfo.static.icon = icon;
-			MyToolInfo.static.title = templateTitle;
-			MyToolInfo.static.commandName = commandName;
-			ve.ui.toolFactory.register( MyToolInfo );
-
 		}
 
 };

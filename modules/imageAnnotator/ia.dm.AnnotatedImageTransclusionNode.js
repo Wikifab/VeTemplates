@@ -99,6 +99,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	figure = domElements[ 0 ];
 	imgWrapper = findChildren( figure, [ 'a', 'span' ] )[ 0 ] || null;
 	img = imgWrapper && findChildren( imgWrapper, [ 'img', 'video' ] )[ 0 ] || null;
+
+	console.log(img);
+
 	caption = findChildren( figure, [ 'figcaption' ] )[ 0 ] || null;
 	classAttr = figure.getAttribute( 'class' );
 	typeofAttrs = figure.getAttribute( 'typeof' ).split( ' ' );
@@ -119,7 +122,7 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		type: types.frameType,
 		href: ( imgWrapper && imgWrapper.getAttribute( 'href' ) ) || '',
 		src: ( img && ( img.getAttribute( 'src' ) || img.getAttribute( 'poster' ) ) ) || '',
-		resource: img && img.getAttribute( 'data-resource' )
+		resource: figure && figure.getAttribute( 'data-resource' )
 	};
 
 	if ( altText !== null ) {
@@ -174,8 +177,13 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	attributes.mw = mwData;
 	attributes.originalMw = mwDataJSON;
 	attributes.jsondata = img && img.getAttribute( 'data-jsondata' );
-	attributes.sourceimage = img && img.getAttribute( 'data-sourceimage' );
+	attributes.sourceimage = figure && figure.getAttribute( 'data-sourceimage' );
 	attributes.thumbSrc = thumbSrc;
+
+	if ( ! attributes.sourceimage) {
+		console.log('MISSING SOURCE IMAGE');
+		console.log(figure);
+	}
 
 	dataElement = {
 		type: type,
@@ -191,6 +199,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	if ( !domElements[ 0 ].getAttribute( 'data-ve-no-generated-contents' ) ) {
 		this.storeGeneratedContents( dataElement, domElements, converter.getStore() );
 	}
+
+	console.log('Annotated toDataElement result');
+	console.log(dataElement);
 
 	return dataElement;
 };
@@ -221,15 +232,12 @@ ve.ce.AnnotatedImageTransclusionNode.prototype.onParseSuccess = function ( defer
 	var regex2 = new RegExp('\\&lt;img ([^<>]+) /(\\&gt;|>)');
 
 	// HACK : set back all img tags escaped by parsoid :
-	/*$replacedContent = preg_replace('@\&lt;img ([^<>]+) /\&gt;@','<img $1 />', $content);
-	$replacedContent = preg_replace('@\&lt;img ([^<>]+) /(\&gt;|>)@','<img $1 />', $content);
-	if($replacedContent) {
-		// in case of error in preg, we do not erase content
-		$content = $replacedContent;
-	} else {
-		trigger_error('Fail to set bask img tags');
-	}*/
 	html = html.replace(regex2,"<img $1 />");
+
+	// HACK : same for <a> tags escaped by parsoid :
+	var regexLink = new RegExp('\\&lt;a ([^<>]+)(\\&gt;|>)(.+)\\&lt;/a( +)(\\&gt;|>)');
+	html = html.replace(regexLink,"<a $1>$2</a>");
+	console.log('onParseSuccess after link');
 	console.log(html);
 
 	// Work around https://github.com/jquery/jquery/issues/1997
