@@ -491,6 +491,7 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 	this.$imageEditorPanelWrapper.empty();
 
 	console.log("PMGMediaDialog.prototype.buildImageEditorPanel ");
+	console.log(imageinfo);
 
 	// hack : if no image info, we build one :
 	// (case when editing an existing image)
@@ -500,8 +501,13 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 		imageinfo.extmetadata = '';
 		imageinfo.url = this.imageModel.imageSrc ? this.imageModel.imageSrc: this.imageModel.url;
 		imageinfo.thumburl = imageinfo.url;
-		imageinfo.width = this.imageModel.getCurrentDimensions().width;
-		imageinfo.height = this.imageModel.getCurrentDimensions().height;
+		if (this.imageModel.getCurrentDimensions()) {
+			imageinfo.width = this.imageModel.getCurrentDimensions().width;
+			imageinfo.height = this.imageModel.getCurrentDimensions().height;
+
+		} else {
+			console.log('Warning : no current dimension');
+		}
 	}
 
 	console.log('buildImageEditorPanel');
@@ -593,9 +599,9 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 	isPortrait = newDimensions.width < ( windowWidth * 3 / 5 );
 	this.mediaImageAnnotationPanel.$element.toggleClass( 've-ui-mwMediaDialog-panel-imageinfo-portrait', isPortrait );
 	this.mediaImageAnnotationPanel.$element.append( this.$imageEditorPanelWrapper );
-	if ( isPortrait ) {
-		$info.outerWidth( Math.floor( windowWidth - $thumbContainer.outerWidth( true ) - 15 ) );
-	}
+	//if ( isPortrait ) {
+	//	$info.outerWidth( Math.floor( windowWidth - $thumbContainer.outerWidth( true ) - 15 ) );
+	//}
 
 	// Let the scrollbar appear naturally if it should
 	this.mediaImageAnnotationPanel.$element.css( 'overflow', '' );
@@ -607,6 +613,8 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
  * @param {Object} info Image info
  */
 ve.ui.PMGMediaDialog.prototype.chooseImageInfo = function ( info ) {
+	console.log('chooseImageInfo');
+	console.log(info);
 	this.$infoPanelWrapper.empty();
 	// Switch panels
 	this.selectedImageInfo = info;
@@ -627,6 +635,8 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		obj = {},
 		info = this.selectedImageInfo;
 
+	console.log("confirmSelectedImage");
+	console.log(info);
 	if ( info ) {
 		imageTitleText = info.title || info.canonicaltitle;
 		// Run title through mw.Title so the File: prefix is localised
@@ -770,6 +780,43 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 }
 
 
+ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNode) {
+	// should be :
+	// atrts = selectedNode.getAttributes();
+
+	console.log("setModelFromNode");
+	var elemAtri = selectedNode.getAttributes();
+	var attrs = {};
+
+
+	if (elemAtri.mw && elemAtri.mw.parts && elemAtri.mw.parts[0] ) {
+		var template = elemAtri.mw.parts[0].template;
+		if (template.params && template.target) {
+			//attrs = template.params;
+			var target = template.target.wt;
+			attrs.resource = target.replace('#annotatedImageLight:','');
+
+			for (var attrname in template.params ) {
+				// TODO : set attribut in wt
+				attrs[attrname] = template.params[attrname].wt;
+			}
+		} else {
+
+			console.log('getModelAttributesFromNode FAIL');
+			console.log(template);
+			attrs = elemAtri;
+		}
+	} else {
+		attrs = elemAtri;
+	}
+	console.log('getModelAttributesFromNode');
+	console.log(elemAtri);
+	console.log(attrs);
+	Object.assign(attrs, elemAtri);
+	console.log(attrs);
+	return attrs;
+}
+
 /**
  * get image model from a node
  * node can be BlockImageNode or AnnotatedImageTransclusion
@@ -778,7 +825,9 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 
 	switch(selectedNode.type) {
 		case 'annotatedImageTransclusion' :
-			this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
+			var attrs = this.getModelAttributesFromNode(selectedNode);
+			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes( attrs, selectedNode.getDocument() )
+			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
 			this.setJsonData(attributes.jsondata);
 			this.sourceImage = attributes.sourceimage;
@@ -956,7 +1005,10 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 	);
 
 	// Size widget
+	/*
 	this.sizeErrorLabel.toggle( false );
+	console.log("attachImageModel");
+	console.log(this.imageModel.getScalable());
 	this.sizeWidget.setScalable( this.imageModel.getScalable() );
 	this.sizeWidget.connect( this, {
 		changeSizeType: 'checkChanged',
@@ -970,6 +1022,7 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 
 	// Update default dimensions
 	this.sizeWidget.updateDefaultDimensions();
+	*/
 
 	// Set initial alt text
 	this.altTextInput.setValue( this.imageModel.getAltText() );
@@ -1011,11 +1064,29 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 		resource = this.basename(this.imageModel.getImageResourceName());
 	}
 	console.log(resource);
+	console.log(resource);
 
 
 	var targetWt = '#annotatedImageLight:' + resource;
-	var jsondata = this.dataJsonModel;
+	var jsondata = this.dataJsonModel? this.dataJsonModel : '';
 	var hash = this.hash ? this.hash : '';
+
+	var imageAttr = this.imageModel.getUpdatedAttributes();
+
+	var tempateAttr = {
+			hash: {
+				wt: hash
+			},
+			jsondata: {
+				wt: jsondata
+			}
+	};
+
+	for(var name in imageAttr) {
+		tempateAttr[name] = {
+				wt : imageAttr[name]
+		};
+	}
 
 	var data = [ {
 		type: 'annotatedImageTransclusion',
@@ -1027,14 +1098,7 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 							'function': 'annotatedImageLight',
 							wt: targetWt
 						},
-						params: {
-							hash: {
-								wt: hash
-							},
-							jsondata: {
-								wt: jsondata
-							}
-						}
+						params: tempateAttr
 					}
 				} ]
 			}
