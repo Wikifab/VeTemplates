@@ -663,6 +663,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 
 			this.sourceImage = info.url;
 			this.dataJsonModel = '';
+			this.hash = '';
 			this.thumbUrl = null;
 		} else {
 			// Update the current image model with the new image source
@@ -677,6 +678,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 			);
 			this.sourceImage = info.url;
 			this.dataJsonModel = '';
+			this.hash = '';
 			this.thumbUrl = null;
 			// Update filename
 			this.filenameFieldset.setLabel(
@@ -830,6 +832,8 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
 			this.setJsonData(attributes.jsondata);
+			// TODO : check hash value here
+			this.hash = attributes.hash;
 			console.log("setModelFromNode");
 			console.log(this.imageModel );
 			console.log(attributes);
@@ -839,6 +843,7 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 		case 'image' :
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
 			this.setJsonData('');
+			this.hash = '';
 			this.jsonDataHasBeenModified = false;
 			break;
 		default :
