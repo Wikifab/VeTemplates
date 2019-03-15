@@ -830,7 +830,10 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
 			this.setJsonData(attributes.jsondata);
-			this.sourceImage = attributes.sourceimage;
+			console.log("setModelFromNode");
+			console.log(this.imageModel );
+			console.log(attributes);
+			this.sourceImage = attributes.sourceimage ? attributes.sourceimage : this.imageModel.imageSrc ;
 			this.jsonDataHasBeenModified = false;
 			break;
 		case 'image' :
