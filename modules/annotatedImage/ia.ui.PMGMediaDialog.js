@@ -1074,6 +1074,9 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 	var jsondata = this.dataJsonModel? this.dataJsonModel : '';
 	var hash = this.hash ? this.hash : '';
 
+	// TODO : this set alwauys dimension to default, remove to allow sizing
+	this.imageModel.scalable.toggleDefault(true);
+
 	var imageAttr = this.imageModel.getUpdatedAttributes();
 
 	var tempateAttr = {

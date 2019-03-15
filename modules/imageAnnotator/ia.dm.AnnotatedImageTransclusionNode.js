@@ -214,6 +214,160 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	return dataElement;
 };
 
+ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc, converter ) {
+	console.log("AnnotatedImageTransclusionNode.static.toDomElements ");
+	console.log(data);
+
+	var dataElement = data[ 0 ];
+
+	if (! dataElement) {
+		dataElement = data;
+	}
+	var template = dataElement.attributes.mw.parts[0].template;
+	var params = template.params;
+
+
+	var width, height,
+		mediaClass = params.mediaClass.wt,
+		figure = doc.createElement( 'figure' ),
+		imgWrapper = doc.createElement( dataElement.attributes.href && dataElement.attributes.href !== '' ? 'a' : 'span' ),
+		img = doc.createElement( mediaClass === 'Image' ? 'img' : 'video' ),
+		wrapper = doc.createElement( 'div' ),
+		captionwrapper = doc.createElement( 'div' ),
+		//classAttr = this.getClassAttrFromAttributes( dataElement.attributes ),
+		captionData = [];
+		paramIndex = 0;
+
+	if ($.isArray(data)) {
+		captionData = data.slice( 1, -1 );
+	}
+
+	console.log("AnnotatedImageTransclusionNode.static.toDomElements ");
+	console.log(data);
+
+
+	width = params.width ? params.width.wt : null;
+	height = params.height ? params.height.wt : null;
+	// If defaultSize is set, and was set on the way in, use the original width and height
+	// we got on the way in.
+	if ( params.defaultSize ) {
+		if ( params.originalWidth && params.originalWidth.wt !== undefined ) {
+			width = params.originalWidth.wt;
+		}
+		if ( params.originalHeight && params.originalHeight.wt !== undefined ) {
+			height = params.originalWidth.wt;
+		}
+	}
+
+
+	console.log(template);
+
+	var resource = params.resource.wt.replace('./','');
+
+	var dataParsoid = ''; //'{"stx":"html","dsr":[455,563,null,null],"pi":[[{"k":"hash","named":true},{"k":"jsondata","named":true},{"k":"1"},{"k":"2"},{"k":"3"}]]}';
+
+
+	var dataToStringify = dataElement.attributes.mw;
+
+	if (dataToStringify.parts[0].template.params.height) {
+		delete dataToStringify.parts[0].template.params.height;
+	}
+	if (dataToStringify.parts[0].template.params.width) {
+		delete dataToStringify.parts[0].template.params.width;
+	}
+	if (dataToStringify.parts[0].template.params.defaultSize) {
+		delete dataToStringify.parts[0].template.params.defaultSize;
+	}
+	if (dataToStringify.parts[0].template.params.borderImage) {
+		delete dataToStringify.parts[0].template.params.borderImage;
+	}
+	if (dataToStringify.parts[0].template.params.jsondata) {
+		delete dataToStringify.parts[0].template.params.jsondata;
+	}
+	if(width) {
+		dataToStringify.parts[0].template.params[paramIndex] = {wt: width + 'px'};
+		paramIndex = paramIndex  +1;
+	}
+
+
+	var dataMw = JSON.stringify(dataToStringify);
+
+	console.log('stringit fy data-mw');
+	console.log(dataToStringify);
+	console.log(dataMw);
+
+	dataMw = '{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Tuto test images Lamp-lasercut 1r.JPG","function":"annotatedImageLight"},"params":{"1":{"wt":"thumbnail"},"2":{"wt":"100px"},"3":{"wt":"right"},"hash":{"wt":""},"jsondata":{"wt":""}},"i":0}}]}';
+
+
+	console.log(dataMw);
+
+	dataMw = '{"parts":[{"template":{"target":{"function":"annotatedImageLight","wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg"},"params":{"hash":{"wt":""},"jsondata":{"wt":""},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"width":{"wt":800},"height":{"wt":600},"defaultSize":{"wt":true},"borderImage":{"wt":false},"align":{"wt":"default"},"src":{"wt":"http://demo-dokit.localtest.me/w/images/7/7a/Test_de_tuto_LB_Final.jpg"},"href":{"wt":"./Fichier:Test de tuto LB Final.jpg"},"resource":{"wt":"./Fichier:Test de tuto LB Final.jpg"}}}}]}';
+	dataMw = '{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg","function":"annotatedImageLight"},"params":{"hash":{"wt":""},"jsondata":{"wt":""},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"width":{"wt":800},"height":{"wt":600}}}}]}';
+	dataMw = '{"parts":[{"template":{"target":{"function":"annotatedImageLight","wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg"},"params":{"0":{"wt":"800px"},"hash":{"wt":""},"jsondata":{"wt":""},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"align":{"wt":"default"},"src":{"wt":"http://demo-dokit.localtest.me/w/images/7/7a/Test_de_tuto_LB_Final.jpg"},"href":{"wt":"./Fichier:Test de tuto LB Final.jpg"},"resource":{"wt":"./Fichier:Test de tuto LB Final.jpg"}}}}]}';
+	dataMw = '{"parts":[{"template":{"target":{"function":"annotatedImageLight","wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg"},"params":{"0":{"wt":"800px"},"hash":{"wt":""},"jsondata":{"wt":""},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"align":{"wt":"default"},"src":{"wt":"http://demo-dokit.localtest.me/w/images/7/7a/Test_de_tuto_LB_Final.jpg"},"href":{"wt":"./Fichier:Test de tuto LB Final.jpg"},"resource":{"wt":"./Fichier:Test de tuto LB Final.jpg"}}}}]}';
+	dataMw = JSON.stringify(dataToStringify);
+	console.log(dataMw);
+	//var dataMw = '{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Tuto test images Lamp-lasercut 1r.JPG","function":"annotatedImageLight"},"params":{"1":{"wt":"thumbnail"},"2":{"wt":"100px"},"3":{"wt":"right"},"hash":{"wt":""},"jsondata":{"wt":""}},"i":0}}]}';
+
+	wrapper.setAttribute( 'class', 'annotatedImageDiv');
+	wrapper.setAttribute( 'data-x-typeof', mediaClass);
+	wrapper.setAttribute( 'data-resource', resource);
+	wrapper.setAttribute( 'data-sourceimage', params.src.wt);
+	wrapper.setAttribute( 'about', '#mwt' + Math.floor( 1000000000 * Math.random() ));
+	wrapper.setAttribute( 'typeof', 'mw:Transclusion');
+	wrapper.setAttribute( 'data-parsoid', dataParsoid);
+	wrapper.setAttribute( 'data-mw', dataMw);
+
+
+	var floatWrapper = doc.createElement( 'div' );
+	floatWrapper.setAttribute( 'class', 'floatright');
+
+
+
+	// RDFa type
+	//figure.setAttribute( 'typeof', this.getRdfa( mediaClass, dataElement.attributes.type ) );
+
+	//if ( classAttr ) {
+	//	figure.className = classAttr;
+	//}
+
+	if ( dataElement.attributes.href !== '' ) {
+		imgWrapper.setAttribute( 'href', dataElement.attributes.href );
+	}
+
+
+
+	img.setAttribute( mediaClass === 'Image' ? 'src' : 'poster', params.src.wt );
+	img.setAttribute( 'width', width );
+	img.setAttribute( 'height', height );
+	//img.setAttribute( 'resource', dataElement.attributes.resource );
+	if ( params.alt !== undefined ) {
+		img.setAttribute( 'alt', params.alt.wt );
+	}
+
+
+	wrapper.appendChild( imgWrapper );
+
+	if( floatWrapper) {
+		imgWrapper.appendChild(floatWrapper);
+		floatWrapper.appendChild( img );
+	} else {
+		imgWrapper.appendChild( img );
+	}
+
+	// If length of captionData is smaller or equal to 2 it means that there is no caption or that
+	// it is empty - in both cases we are going to skip appending <figcaption>.
+	if ( captionData.length > 2 ) {
+		if ($.isArray(data)) {
+			converter.getDomSubtreeFromData( data.slice( 1, -1 ), captionwrapper );
+			while ( captionwrapper.firstChild ) {
+				figure.appendChild( captionwrapper.firstChild );
+			}
+		}
+	}
+	return [ wrapper ];
+};
+
 /**
  * overide parent method
  * I don't know why, but if we don't overide, an additional arg is passed in first position of the method (dataModel)

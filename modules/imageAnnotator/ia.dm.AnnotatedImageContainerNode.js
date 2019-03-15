@@ -26,7 +26,7 @@ OO.inheritClass( ve.dm.AnnotatedImageContainerNode, ve.dm.MWTransclusionBlockNod
 
 /* Static members */
 
-ve.dm.AnnotatedImageContainerNode.static.name = 'annotatedImageTransclusion';
+ve.dm.AnnotatedImageContainerNode.static.name = 'ssannotatedImageTransclusion';
 //ve.dm.AnnotatedImageContainerNode.static.name = 'mwTransclusion';
 
 ve.dm.AnnotatedImageContainerNode.static.matchTagNames = ['div', 'p'];

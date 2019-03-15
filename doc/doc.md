@@ -113,7 +113,29 @@ Image Annotée :
 	</div>
 
 
+# work flow : 
 
+tools add elements in editor by adding such data : 
+
+data = [
+		{
+			type: 'pmgBlockImage',
+			attributes: annottatedInfo
+		},
+		{
+			type: 'mwBlockImage',
+			attributes: editAttributes
+		},
+		{ type: 'mwImageCaption' },
+		{ type: '/mwImageCaption' },
+		{ type: '/mwBlockImage' },
+		{ type: '/pmgBlockImage' }
+	];
+
+each type match a "ve.dm<Model>Node" class
+
+when focus out, it convert editor content to HTML, using "ve.dm.<models>Node.toDomElements()" function
+then it calls parsoid to convert html to wikitext
 
 
 
