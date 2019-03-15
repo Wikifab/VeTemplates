@@ -284,6 +284,12 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 	if (dataToStringify.parts[0].template.params.jsondata) {
 		delete dataToStringify.parts[0].template.params.jsondata;
 	}
+	if ( dataToStringify.parts[0].template.params.href == '') {
+		delete dataToStringify.parts[0].template.params.href;
+	}
+	if ( dataToStringify.parts[0].template.params.isLinked ) {
+		delete dataToStringify.parts[0].template.params.isLinked;
+	}
 	if(width) {
 		dataToStringify.parts[0].template.params[paramIndex] = {wt: width + 'px'};
 		paramIndex = paramIndex  +1;
@@ -294,12 +300,16 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 
 	console.log('stringit fy data-mw');
 	console.log(dataToStringify);
-	console.log(dataMw);
+	//console.log(dataMw);
 
 	dataMw = '{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Tuto test images Lamp-lasercut 1r.JPG","function":"annotatedImageLight"},"params":{"1":{"wt":"thumbnail"},"2":{"wt":"100px"},"3":{"wt":"right"},"hash":{"wt":""},"jsondata":{"wt":""}},"i":0}}]}';
 
 
-	console.log(dataMw);
+	// working
+	//{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg","function":"annotatedImageLight"},"params":{"0":{"wt":"800px"},"hash":{"wt":"cd32c305cd86e4251e40e177c8d59e18"},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"align":{"wt":"default"},"src":{"wt":"/w/images/thumb/7/7a/Test_de_tuto_LB_Final.jpg/ia-cd32c305cd86e4251e40e177c8d59e18-px-Test_de_tuto_LB_Final.jpg.png"},"href":{"wt":"./Fichier:Test de tuto LB Final.jpg"},"resource":{"wt":"./Fichier:Test de tuto LB Final.jpg"}},"i":0}}]}
+	// not working
+	//{"parts":[{"template":{"target":{"function":"annotatedImageLight","wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg"},"params":{"0":{"wt":"800px"},"hash":{"wt":"7f37ed0e83b300ed16023a625366f787"},"mediaClass":{"wt":"Image"},"type":{"wt":"frameless"},"align":{"wt":"default"},"src":{"wt":"/w/images/thumb/7/7a/Test_de_tuto_LB_Final.jpg/ia-7f37ed0e83b300ed16023a625366f787-px-Test_de_tuto_LB_Final.jpg.png"},"href":{"wt":""},"resource":{"wt":"Fichier:Test de tuto LB Final.jpg"},"isLinked":{"wt":true}}}}]}
+
 
 	dataMw = '{"parts":[{"template":{"target":{"function":"annotatedImageLight","wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg"},"params":{"hash":{"wt":""},"jsondata":{"wt":""},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"width":{"wt":800},"height":{"wt":600},"defaultSize":{"wt":true},"borderImage":{"wt":false},"align":{"wt":"default"},"src":{"wt":"http://demo-dokit.localtest.me/w/images/7/7a/Test_de_tuto_LB_Final.jpg"},"href":{"wt":"./Fichier:Test de tuto LB Final.jpg"},"resource":{"wt":"./Fichier:Test de tuto LB Final.jpg"}}}}]}';
 	dataMw = '{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Test de tuto LB Final.jpg","function":"annotatedImageLight"},"params":{"hash":{"wt":""},"jsondata":{"wt":""},"mediaClass":{"wt":"Image"},"type":{"wt":"thumb"},"width":{"wt":800},"height":{"wt":600}}}}]}';
