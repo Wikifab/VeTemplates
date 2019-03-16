@@ -185,6 +185,11 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	attributes.mw = mwData;
 	attributes.originalMw = mwDataJSON;
 	attributes.jsondata = img && img.getAttribute( 'data-jsondata' );
+	attributes.hash = img && img.getAttribute( 'data-hash' );
+	console.log('toDataElement 3');
+	console.log(attributes.jsondata);
+	console.log(mwData);
+
 	attributes.sourceimage = figure && figure.getAttribute( 'data-sourceimage' );
 	attributes.thumbSrc = thumbSrc;
 
@@ -281,9 +286,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 	if (dataToStringify.parts[0].template.params.borderImage) {
 		delete dataToStringify.parts[0].template.params.borderImage;
 	}
-	if (dataToStringify.parts[0].template.params.jsondata) {
-		delete dataToStringify.parts[0].template.params.jsondata;
-	}
+	//if (dataToStringify.parts[0].template.params.jsondata) {
+		//delete dataToStringify.parts[0].template.params.jsondata;
+	//}
 	if ( dataToStringify.parts[0].template.params.href == '') {
 		delete dataToStringify.parts[0].template.params.href;
 	}
@@ -350,6 +355,10 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 	img.setAttribute( mediaClass === 'Image' ? 'src' : 'poster', params.src.wt );
 	img.setAttribute( 'width', width );
 	img.setAttribute( 'height', height );
+	if (dataToStringify.parts[0].template.params.jsondata) {
+		img.setAttribute( 'data-jsondata', dataToStringify.parts[0].template.params.jsondata);
+		img.setAttribute( 'data-hash', dataToStringify.parts[0].template.params.hash);
+	}
 	//img.setAttribute( 'resource', dataElement.attributes.resource );
 	if ( params.alt !== undefined ) {
 		img.setAttribute( 'alt', params.alt.wt );

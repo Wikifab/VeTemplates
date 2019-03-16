@@ -16,9 +16,6 @@
  */
 ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
 
-	console.log('open dialog');
-	console.log(config);
-
 	// Parent constructor
 	ve.ui.PMGMediaDialog.super.call( this, config );
 
@@ -156,7 +153,6 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 	// Parent method
 	ve.ui.PMGMediaDialog.super.prototype.initialize.call( this );
-	console.log("PMGMediaDialog.prototype.initialize parent done");
 
 
 /*
@@ -405,9 +401,6 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 	}
 	this.panels.setItem(currentPanel);
 
-
-	console.log('initDialog');
-	console.log(this.image);
 };
 
 /**
@@ -510,10 +503,6 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 		}
 	}
 
-	console.log('buildImageEditorPanel');
-	console.log(this.imageModel);
-	console.log(imageinfo);
-
 	var imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
 		imageTitle = new OO.ui.LabelWidget( {
 			label: mw.Title.newFromText( imageTitleText ).getNameText()
@@ -550,9 +539,6 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 	$thumbContainer
 		.append( $image.prop( 'src', imageinfo.thumburl ) );
 
-	console.log('buildImageEditorPanel $editorContainer');
-	console.log($editorContainer);
-	console.log($image);
 	this.$editorContainer = $editorContainer;
 
 
@@ -773,9 +759,6 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	}
 
 	console.log('startImageEditor');
-	console.log(img);
-	console.log(this.getJsonData());
-	console.log(this.$editorContainer);
 
 	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback);
 
@@ -786,7 +769,7 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 	// should be :
 	// atrts = selectedNode.getAttributes();
 
-	console.log("setModelFromNode");
+	console.log("PMG getModelAttributesFromNode");
 	var elemAtri = selectedNode.getAttributes();
 	var attrs = {};
 
@@ -831,12 +814,9 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes( attrs, selectedNode.getDocument() )
 			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
-			this.setJsonData(attributes.jsondata);
+			this.setJsonData(attrs.jsondata);
 			// TODO : check hash value here
-			this.hash = attributes.hash;
-			console.log("setModelFromNode");
-			console.log(this.imageModel );
-			console.log(attributes);
+			this.hash = attrs.hash;
 			this.sourceImage = attributes.sourceimage ? attributes.sourceimage : this.imageModel.imageSrc ;
 			this.jsonDataHasBeenModified = false;
 			break;
@@ -1071,8 +1051,6 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 	if (this.imageModel) {
 		resource = this.basename(this.imageModel.getImageResourceName());
 	}
-	console.log(resource);
-	console.log(resource);
 
 
 	var targetWt = '#annotatedImageLight:' + resource;
