@@ -102,15 +102,36 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 
 	img = imgWrapper && findChildren( imgWrapper, [ 'img', 'video' ] )[ 0 ] || null;
 
+	var imgLastWrapper = imgWrapper;
+
 	// if img not found, it may be in a sub div element :
 	if (! img) {
 		divFloatWrapper = imgWrapper && findChildren( imgWrapper, [ 'div' ] )[ 0 ] || null;
 		if (divFloatWrapper) {
+			imgLastWrapper = divFloatWrapper;
 			img = divFloatWrapper && findChildren( divFloatWrapper, [ 'img', 'video' ] )[ 0 ] || null;
+		}
+		if (! img) {
+			var divThumb = divFloatWrapper && findChildren( divFloatWrapper, [ 'div'] )[ 0 ] || null;
+			var divThumbiner = divThumb && findChildren( divThumb, [ 'div'] )[ 0 ] || null;
+			imgLastWrapper = divThumbiner;
+			img = divThumbiner && findChildren( divThumbiner, [ 'img', 'video' ] )[ 0 ] || null;
+
+		}
+		if (! img) {
+			var divThumb = divFloatWrapper && findChildren( divFloatWrapper, [ 'div'] )[ 0 ] || null;
+
+			console.log('must find img');
+			console.log(imgWrapper);
+			console.log(divFloatWrapper);
+			console.log(divThumb);
 		}
 	}
 
-	caption = findChildren( figure, [ 'figcaption' ] )[ 0 ] || null;
+	var captionElement = $(figure).find('.thumbcaption')[0];
+
+
+	caption = captionElement && captionElement.innerText || '';
 	classAttr = figure.getAttribute( 'class' );
 	typeofAttrs = figure.getAttribute( 'typeof' ).split( ' ' );
 	errorIndex = typeofAttrs.indexOf( 'mw:Error' );
@@ -133,12 +154,17 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		resource: figure && figure.getAttribute( 'data-resource' )
 	};
 
+	console.log("toDataElement attr src");
+	console.log(attributes.src);
+	console.log(domElements);
+
 	if ( altText !== null ) {
 		attributes.alt = altText;
 	}
 	if ( errorIndex !== -1 ) {
 		attributes.isError = true;
 	}
+
 
 	//this.setClassAttributes( attributes, classAttr );
 
@@ -171,8 +197,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		}
 	}
 
-	dataElement = { type: this.name, attributes: attributes };
-
+	if ( caption ) {
+		attributes.caption =  caption;
+	}
 
 	// above was attribut common to MwImage,
 	// next we add attributs abouts annotations
@@ -187,6 +214,7 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	attributes.jsondata = img && img.getAttribute( 'data-jsondata' );
 	attributes.hash = img && img.getAttribute( 'data-hash' );
 	console.log('toDataElement 3');
+	console.log(domElements);
 	console.log(attributes.jsondata);
 	console.log(mwData);
 
@@ -246,10 +274,6 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 	if ($.isArray(data)) {
 		captionData = data.slice( 1, -1 );
 	}
-
-	console.log("AnnotatedImageTransclusionNode.static.toDomElements ");
-	console.log(data);
-
 
 	width = params.width ? params.width.wt : null;
 	height = params.height ? params.height.wt : null;
@@ -364,6 +388,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 		img.setAttribute( 'alt', params.alt.wt );
 	}
 
+	console.log('img dom generated');
+	console.log(img);
+
 
 	wrapper.appendChild( imgWrapper );
 
@@ -385,6 +412,44 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 		}
 	}
 	return [ wrapper ];
+};
+
+
+/**
+ * we must convert attribut from image for transclusion :
+ *
+ * "width=Y" must be converted ty "Ypx"
+ * "catpion=XXX" set in last params , without prefix 'caption='
+ */
+ve.dm.AnnotatedImageTransclusionNode.prototype.getWikitext = function () {
+	console.log("AnnotatedImageTransclusionNode.prototype.getWikitext");
+	var attrs = this.getAttribute( 'mw' );
+
+	if (attrs.parts[0].template.params.width.wt) {
+		attrs.parts[0].template.params.size = {
+				wt: attrs.parts[0].template.params.width.wt + 'px'
+		};
+	}
+	console.log(attrs);
+
+	var wikitext = this.constructor.static.getWikitext( attrs );
+
+	var wikitext = wikitext.replace('|size=','|');
+
+
+	var caption = '';
+
+	var regex = /\|caption=([^|}]+)/g;
+	var found = regex.exec(wikitext);
+	if(found[1] != undefined) {
+		caption = found[1];
+	}
+	wikitext = wikitext.replace ('}}','|' + caption + '}}');
+
+	console.log(found);
+
+	console.log(wikitext);
+	return wikitext;
 };
 
 /**

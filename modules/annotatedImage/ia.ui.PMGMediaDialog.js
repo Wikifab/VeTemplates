@@ -142,6 +142,11 @@ ve.ui.PMGMediaDialog.prototype.setJsonData = function (jsonData) {
 ve.ui.PMGMediaDialog.prototype.jsonDataHasBeenModified = function () {
 	return this.jsonDataHasBeenModified;
 }
+ve.ui.PMGMediaDialog.prototype.setCaption = function (caption) {
+	this.caption = caption;
+	this.simpleCaptionTextInput.setValue( caption);
+
+}
 
 /**
  * @inheritdoc
@@ -153,7 +158,6 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 	// Parent method
 	ve.ui.PMGMediaDialog.super.prototype.initialize.call( this );
-
 
 /*
 	this.panels = new OO.ui.StackLayout();
@@ -385,6 +389,17 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 */
 
+	// we replace Caption field by an simpler one :
+	this.simpleCaptionTextInput = new OO.ui.TextInputWidget( { spellcheck: true } );
+
+	this.simpleCaptionTextInput.$element.addClass( 've-ui-mwMediaDialog-altText' );
+
+	this.captionFieldset.$element.children('.oo-ui-widget').hide();
+	this.captionFieldset.$element.append(this.simpleCaptionTextInput.$element);
+
+	this.simpleCaptionTextInput.connect( this, { change: 'onSimpleCaptionTextChange' } );
+
+
 	this.$imageEditorPanelWrapper = $( '<div>' ).addClass( 've-ui-mwMediaDialog-panel-imageeditor-wrapper' );
 
 
@@ -502,6 +517,7 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 			console.log('Warning : no current dimension');
 		}
 	}
+	console.log(imageinfo);
 
 	var imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
 		imageTitle = new OO.ui.LabelWidget( {
@@ -717,7 +733,8 @@ ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
 				this.isInsertion && this.imageModel ||
 				captionChanged ||
 				this.imageModel.hasBeenModified() ||
-				this.jsonDataHasBeenModified
+				this.jsonDataHasBeenModified||
+				this.captionHasBeenModified
 			)
 		) {
 			this.actions.setAbilities( { insert: true, apply: true } );
@@ -765,11 +782,29 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 }
 
 
+ve.ui.PMGMediaDialog.prototype.getCaptionFromAttributes = function (attrs) {
+
+	var index = 0;
+
+	// look for last numeric index
+	while( attrs[index] != undefined) {
+		index = index + 1;
+	}
+	index = index - 1;
+
+	if (index >= 0) {
+		return attrs[index];
+	}
+	console.log('fallback to named caption attr');
+	return attrs.caption;
+}
+
 ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNode) {
 	// should be :
 	// atrts = selectedNode.getAttributes();
 
 	console.log("PMG getModelAttributesFromNode");
+	console.log(selectedNode);
 	var elemAtri = selectedNode.getAttributes();
 	var attrs = {};
 
@@ -784,6 +819,7 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 			for (var attrname in template.params ) {
 				// TODO : set attribut in wt
 				attrs[attrname] = template.params[attrname].wt;
+				elemAtri[attrname] = template.params[attrname].wt;
 			}
 		} else {
 
@@ -794,6 +830,10 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 	} else {
 		attrs = elemAtri;
 	}
+	if (! elemAtri.src && elemAtri.sourceimage) {
+		elemAtri.src = elemAtri.sourceimage;
+	}
+	elemAtri.caption = this.getCaptionFromAttributes(elemAtri);
 	console.log('getModelAttributesFromNode');
 	console.log(elemAtri);
 	console.log(attrs);
@@ -801,6 +841,8 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 	console.log(attrs);
 	return attrs;
 }
+
+
 
 /**
  * get image model from a node
@@ -811,20 +853,26 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 	switch(selectedNode.type) {
 		case 'annotatedImageTransclusion' :
 			var attrs = this.getModelAttributesFromNode(selectedNode);
+			console.log('PMGMediaDialog.prototype.setModelFromNode');
+			console.log(attrs);
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes( attrs, selectedNode.getDocument() )
 			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
 			this.setJsonData(attrs.jsondata);
+			this.setCaption(attrs.caption);
 			// TODO : check hash value here
 			this.hash = attrs.hash;
 			this.sourceImage = attributes.sourceimage ? attributes.sourceimage : this.imageModel.imageSrc ;
 			this.jsonDataHasBeenModified = false;
+			this.captionHasBeenModified = false;
 			break;
 		case 'image' :
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
 			this.setJsonData('');
+			this.caption = '';
 			this.hash = '';
 			this.jsonDataHasBeenModified = false;
+			this.captionHasBeenModified = false;
 			break;
 		default :
 			console.log('PMGMediaDialog.prototype.getModelFromNode : unknown type');
@@ -833,6 +881,19 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 	}
 	return this.imageModel;
 }
+
+/**
+ * Handle image model type change
+ *
+ * @param {string} type Image type
+ */
+ve.ui.PMGMediaDialog.prototype.onSimpleCaptionTextChange = function ( value ) {
+
+	this.caption = value;
+	this.captionHasBeenModified = true;
+
+	this.checkChanged();
+};
 
 /**
  * @inheritdoc
@@ -993,7 +1054,7 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 	);
 
 	// Size widget
-	/*
+
 	this.sizeErrorLabel.toggle( false );
 	console.log("attachImageModel");
 	console.log(this.imageModel.getScalable());
@@ -1010,7 +1071,7 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 
 	// Update default dimensions
 	this.sizeWidget.updateDefaultDimensions();
-	*/
+
 
 	// Set initial alt text
 	this.altTextInput.setValue( this.imageModel.getAltText() );
@@ -1058,7 +1119,7 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 	var hash = this.hash ? this.hash : '';
 
 	// TODO : this set alwauys dimension to default, remove to allow sizing
-	this.imageModel.scalable.toggleDefault(true);
+	//this.imageModel.scalable.toggleDefault(true);
 
 	var imageAttr = this.imageModel.getUpdatedAttributes();
 
@@ -1075,6 +1136,10 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 		tempateAttr[name] = {
 				wt : imageAttr[name]
 		};
+	}
+
+	if (this.caption) {
+		tempateAttr.caption = {wt: this.caption};
 	}
 
 	var data = [ {
@@ -1097,6 +1162,8 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 		type: '/annotatedImageTransclusion'
 		//type: '/simpleTransclusion',
 	} ];
+	console.log('PMGMediaDialog.prototype.getData result');
+	console.log(data);
 
 	return data;
 }
@@ -1177,17 +1244,24 @@ ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
 			}
 			fragment.insertContent( contentToInsert );
 			// Check if there is caption document and insert it
+
+			console.log("insertAnnotatedImageNode blockImage");
+			console.log(contentToInsert);
 			captionDoc = this.imageModel.getCaptionDocument();
-			if ( captionDoc.data.hasContent() ) {
+			console.log(captionDoc);
+			/*
+			 * this doesn't works : it add caption after image object
+			 * if ( captionDoc.data.hasContent() ) {
 				// Add contents of new caption
 				surfaceModel.change(
 					ve.dm.TransactionBuilder.static.newFromDocumentInsertion(
 						surfaceModel.getDocument(),
 						fragment.getSelection().getRange().start + 2,
-						this.getCaptionDocument()
+						this.imageModel.getCaptionDocument()
 					)
 				);
-			}
+			}*/
+			console.log(fragment);
 			return fragment;
 
 		default:
