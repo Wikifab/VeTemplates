@@ -844,6 +844,19 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 	console.log(attrs);
 	Object.assign(attrs, elemAtri);
 	console.log(attrs);
+	if (attrs.size && attrs.width == null) {
+		attrs.width = attrs.size.replace('px', '');
+		if(attrs.height == null) {
+			attrs.height = attrs.width;
+		}
+	}
+	if ( attrs.width == null) {
+		attrs.width = 600;
+	}
+	if ( attrs.height == null) {
+		attrs.height = 450;
+	}
+
 	return attrs;
 }
 
@@ -1024,6 +1037,28 @@ ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequer
 	this.currentPanel = panel || 'imageinfo';
 };
 
+
+ve.ui.PMGMediaDialog.prototype.getCurrentDimensions = function () {
+	//this call this.imageModel.scalable.getCurrentDimensions();
+	var result = this.imageModel.getCurrentDimensions();
+
+	if (result == null) {
+		result = {
+			width: 600,
+			height: 450
+		}
+	}
+	if ( ! result.width) {
+		console.log('getCurrentDimensions set missing width');
+		result.width = 600;
+	}
+	if ( ! result.height) {
+		console.log('getCurrentDimensions set missing height');
+		result.height = 450;
+	}
+	return result;
+}
+
 /**
  * Attach the image model to the dialog
  */
@@ -1063,7 +1098,13 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 	this.sizeErrorLabel.toggle( false );
 	console.log("attachImageModel");
 	console.log(this.imageModel.getScalable());
-	this.sizeWidget.setScalable( this.imageModel.getScalable() );
+	var scalableObject = this.imageModel.getScalable();
+	if ( ! scalableObject.getCurrentDimensions()) {
+		console.log('Warning : dimensions empty');
+		scalableObject.setCurrentDimensions(this.getCurrentDimensions());
+		console.log(scalableObject.getCurrentDimensions());
+	}
+	this.sizeWidget.setScalable( scalableObject );
 	this.sizeWidget.connect( this, {
 		changeSizeType: 'checkChanged',
 		change: 'checkChanged',
