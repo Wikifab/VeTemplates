@@ -441,12 +441,10 @@ ve.dm.AnnotatedImageTransclusionNode.prototype.getWikitext = function () {
 
 	var regex = /\|caption=([^|}]+)/g;
 	var found = regex.exec(wikitext);
-	if(found[1] != undefined) {
+	if(found && found[1] != undefined) {
 		caption = found[1];
 	}
 	wikitext = wikitext.replace ('}}','|' + caption + '}}');
-
-	console.log(found);
 
 	console.log(wikitext);
 	return wikitext;

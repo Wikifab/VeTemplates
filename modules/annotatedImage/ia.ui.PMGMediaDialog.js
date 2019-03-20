@@ -776,6 +776,11 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	}
 
 	console.log('startImageEditor');
+	var currentDim = this.imageModel.getCurrentDimensions();
+
+	console.log(currentDim);
+	console.log(img);
+
 
 	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback);
 
@@ -1140,6 +1145,8 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 
 	if (this.caption) {
 		tempateAttr.caption = {wt: this.caption};
+	} else {
+		tempateAttr.caption = {wt: ''};
 	}
 
 	var data = [ {
