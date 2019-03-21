@@ -916,6 +916,16 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 			this.jsonDataHasBeenModified = false;
 			this.captionHasBeenModified = false;
 			break;
+		case 'mwBlockImage' :
+		case 'mwInlineImage' :
+			this.imageModel = ve.dm.MWImageModel.static.newFromImageNode( this.selectedNode );
+			this.setJsonData('');
+			this.caption = '';
+			this.hash = '';
+			this.sourceImage = this.imageModel.imageSrc ;
+			this.jsonDataHasBeenModified = false;
+			this.captionHasBeenModified = false;
+			break;
 		default :
 			console.log('PMGMediaDialog.prototype.getModelFromNode : unknown type');
 			console.log(selectedNode);
