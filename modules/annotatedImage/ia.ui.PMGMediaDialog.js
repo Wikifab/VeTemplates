@@ -811,6 +811,10 @@ ve.ui.PMGMediaDialog.prototype.getCaptionFromAttributes = function (attrs) {
 
 	var index = 0;
 
+	if (attrs.caption) {
+		return attrs.caption;
+	}
+
 	// look for last numeric index
 	while( attrs[index] != undefined) {
 		index = index + 1;
