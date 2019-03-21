@@ -57,6 +57,10 @@
 				"ext.vetemplates.css"
 			],
 			"messages": [
+				"vetemplate-dialog-annotatedimage-title",
+				"vetemplate-dialog-annotatedimage-description",
+				"vetemplate-dialog-annotatedimage-editbutton",
+				"vetemplate-dialog-annotatedimage-cancel-annotate",
 				"visualeditor-simpletemplateinspector-title",
 				"vetemplate-dialogbutton-template-title-info",
 				"vetemplate-dialogbutton-template-title-warning",

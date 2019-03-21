@@ -5,6 +5,10 @@
         ]
     },
 	"vetemplates-desc": "Add templates in Visual Editor",
+	"vetemplate-dialog-annotatedimage-title": "Image",
+	"vetemplate-dialog-annotatedimage-description": "",
+	"vetemplate-dialog-annotatedimage-editbutton": "Edit image",
+	"vetemplate-dialog-annotatedimage-cancel-annotate": "Cancel edit",
 	"visualeditor-simpletemplateinspector-title": "Edit",
 	"vetemplate-dialogbutton-template-title-caution": "Warning",
 	"vetemplate-dialogbutton-template-title-dont": "Not to do",

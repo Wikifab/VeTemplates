@@ -24,11 +24,11 @@ ve.ui.AnnotatedImageContextItem = function VeUiAnnotatedImageContextItem() {
 
 	// if i18n message exists for this template, we use it :
 	var templateName = ve.ce.MWTransclusionNode.static.getDescription( this.model ).toLowerCase();
-	var label = mw.message( 'vetemplate-dialogbutton-annotatedimage-title-' + templateName );
+	var label = mw.message( 'vetemplate-dialog-annotatedimage-title' );
 	if( label.exists() ) {
 		this.setLabel( label.text() );
 	} else {
-		console.log('message doesn\'t exists : ' + 'vetemplate-dialogbutton-annotatedimage-title-' + templateName );
+		console.log('message doesn\'t exists (TER) : ' + 'vetemplate-dialog-annotatedimage-title'  );
 	}
 };
 
@@ -106,7 +106,7 @@ ve.ui.AnnotatedImageContextItem.prototype.getDescription = function () {
 	//this.selectedNode.getAttribute( 'mw' );
 
 	// old description : texte including template name :
-	return ve.msg('vetemplate-dialog-annotatedImage-description');
+	return ve.msg('vetemplate-dialog-annotatedimage-description');
 };
 
 

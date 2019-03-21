@@ -113,8 +113,20 @@ ve.ui.PMGMediaDialog.static.actions = [
 	},
 	{
 		action: 'annotate',
-		label: OO.ui.deferMsg( 'vetemplate-dialog-media-edit-image' ),
+		label: OO.ui.deferMsg( 'vetemplate-dialog-annotatedimage-editbutton' ),
 		modes: [ 'edit', 'insert' ]
+	},
+	{
+		action: 'annotate-back',
+		label: OO.ui.deferMsg( 'vetemplate-dialog-annotatedimage-cancel-annotate' ),
+		flags: [ 'safe', 'back' ],
+		modes: [ 'edit-annotate', 'insert-annotate' ]
+	},
+	{
+		action: 'annotate-save',
+		label: OO.ui.deferMsg( 'imageannotator-button-save' ),
+		flags: [ 'primary', 'progressive' ],
+		modes: [ 'edit-annotate', 'insert-annotate' ]
 	}
 ];
 
@@ -774,6 +786,12 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 		mediaDialog.checkChanged();
 		mediaDialog.switchPanels( 'edit' );
 	}
+	var cancelCallback = function (editor) {
+
+		console.log("PMG cancelcallback");
+		mediaDialog.checkChanged();
+		mediaDialog.switchPanels( 'edit' );
+	}
 
 	console.log('startImageEditor');
 	var currentDim = this.imageModel.getCurrentDimensions();
@@ -781,8 +799,10 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	console.log(currentDim);
 	console.log(img);
 
+	var options = [];
+	options['no-controlbar'] = true;
 
-	mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback);
+	this.imageAnnotationEditor = mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback, options);
 
 }
 
@@ -1022,7 +1042,7 @@ ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequer
 			// Set the edit panel
 			this.panels.setItem( this.mediaImageAnnotationPanel );
 			// Hide/show buttons
-			this.actions.setMode( this.selectedNode ? 'edit' : 'insert' );
+			this.actions.setMode( this.selectedNode ? 'edit-annotate' : 'insert-annotate' );
 			this.startImageEditor();
 			break;
 		default:
@@ -1323,6 +1343,8 @@ ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
 ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 	var handler;
 
+	var mediaDialog = this;
+
 	switch ( action ) {
 		case 'change':
 			handler = function () {
@@ -1397,6 +1419,19 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 		case 'annotate':
 			handler = function () {
 				this.switchPanels( 'annotate', true );
+			};
+			break;
+		case 'annotate-back':
+			handler = function () {
+				mediaDialog.imageAnnotationEditor.hide();
+				this.switchPanels( 'edit' );
+				//this.switchPanels( 'annotate', true );
+			};
+			break;
+		case 'annotate-save':
+			handler = function () {
+				mediaDialog.imageAnnotationEditor.save();
+				//this.switchPanels( 'annotate', true );
 			};
 			break;
 		default:
