@@ -1415,8 +1415,8 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 					this.selectedNode.type === this.imageModel.getImageNodeType() &&
 					// And we didn't change the image itself
 					this.selectedNode.getAttribute( 'src' ) ===
-						this.imageModel.getImageSource() &&
-					! this.imageModel.hasAnnotationChanges()
+						this.imageModel.getImageSource()
+					// && ! this.imageModel.hasAnnotationChanges()
 				) {
 					// We only need to update the attributes of the current node
 					//this.imageModel.updateImageNode( this.selectedNode, surfaceModel );
