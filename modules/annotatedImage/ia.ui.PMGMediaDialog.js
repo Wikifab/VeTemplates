@@ -954,6 +954,7 @@ ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
 
 	return ve.ui.MWMediaDialog.super.prototype.getSetupProcess.call( this, data )
 		.next( function () {
+
 			var
 				dialog = this,
 				pageTitle = mw.config.get( 'wgTitle' ),
@@ -1458,3 +1459,25 @@ ve.ui.PMGMediaDialog.prototype.getActionProcess = function ( action ) {
 /* Registration */
 
 ve.ui.windowFactory.register( ve.ui.PMGMediaDialog );
+
+// hack  : replace function MWMediaDialog.prototype.getReadyProcess
+// to manage upload after file drop
+/**
+ * @inheritdoc
+ */
+ve.ui.MWMediaDialog.prototype.getReadyProcess = function ( data ) {
+
+	console.log('MWMediaDialog.prototype.getReadyProcess hacked');
+	return ve.ui.MWMediaDialog.super.prototype.getReadyProcess.call( this, data )
+		.next( function () {
+
+			var panel = this.selectedNode ? 'edit' : 'search';
+			// #switchPanels triggers field focus, so do this in the ready process
+			this.switchPanels( panel );
+			if (panel == 'search' && data.file) {
+				this.searchTabs.setTabPanel( 'upload' );
+			}
+			// Revalidate size
+			this.sizeWidget.validateDimensions();
+		}, this );
+};
