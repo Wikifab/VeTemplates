@@ -30,6 +30,7 @@ ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
 	this.selectedImageInfo = null;
 	this.searchCache = {};
 	this.jsonDataHasBeenModified = false;
+	this.waitingGeneration = false;
 
 	this.$element.addClass( 've-ui-mwMediaDialog' );
 	this.$element.addClass( 've-ui-pMGMediaDialog' );
@@ -731,6 +732,13 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
 	var captionChanged = false;
 
+
+	if ( this.waitingGeneration) {
+		// if annotated image generation is running, do not allow insert/apply
+		this.actions.setAbilities( { insert: false, apply: false } );
+		return;
+	}
+
 	// Only check 'changed' status after the model has finished
 	// building itself
 	if ( !this.isSettingUpModel ) {
@@ -773,6 +781,8 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 		console.log(thumbData);
 		mediaDialog.imageModel.imageSrc = url;
 		mediaDialog.hash = thumbData.hash;
+		mediaDialog.waitingGeneration = false;
+		mediaDialog.checkChanged();
 	}
 
 	var updateCallback = function (editor, jsondata) {
@@ -781,6 +791,7 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 		mediaDialog.jsonDataHasBeenModified = true;
 
 		editorObject = editor;
+		mediaDialog.waitingGeneration = true;
 		editor.generateThumb(thumbGenerated);
 
 		mediaDialog.checkChanged();
