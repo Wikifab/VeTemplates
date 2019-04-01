@@ -1369,10 +1369,7 @@ ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
 			fragment.insertContent( contentToInsert );
 			// Check if there is caption document and insert it
 
-			console.log("insertAnnotatedImageNode blockImage");
-			console.log(contentToInsert);
 			captionDoc = this.imageModel.getCaptionDocument();
-			console.log(captionDoc);
 			/*
 			 * this doesn't works : it add caption after image object
 			 * if ( captionDoc.data.hasContent() ) {
@@ -1385,7 +1382,6 @@ ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
 					)
 				);
 			}*/
-			console.log(fragment);
 			return fragment;
 
 		default:

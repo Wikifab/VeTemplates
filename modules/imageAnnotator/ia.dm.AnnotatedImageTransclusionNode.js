@@ -57,9 +57,6 @@ ve.dm.AnnotatedImageTransclusionNode.static.matchFunction = function ( node ) {
 
 	for (var index in this.matchTemplatesNames) {
 		if (name.startsWith(this.matchTemplatesNames[index])) {
-			console.log('match template annotated image b');
-			console.log(attr);
-			console.log(node);
 			return true
 		}
 	}
@@ -121,10 +118,10 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		if (! img) {
 			var divThumb = divFloatWrapper && findChildren( divFloatWrapper, [ 'div'] )[ 0 ] || null;
 
-			console.log('must find img');
-			console.log(imgWrapper);
-			console.log(divFloatWrapper);
-			console.log(divThumb);
+//			console.log('must find img');
+//			console.log(imgWrapper);
+//			console.log(divFloatWrapper);
+//			console.log(divThumb);
 		}
 	}
 
@@ -154,9 +151,9 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		resource: figure && figure.getAttribute( 'data-resource' )
 	};
 
-	console.log("toDataElement attr src");
-	console.log(attributes.src);
-	console.log(domElements);
+	//console.log("toDataElement attr src");
+	//console.log(attributes.src);
+	//console.log(domElements);
 
 	if ( altText !== null ) {
 		attributes.alt = altText;
@@ -213,10 +210,10 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 	attributes.originalMw = mwDataJSON;
 	attributes.jsondata = img && img.getAttribute( 'data-jsondata' );
 	attributes.hash = img && img.getAttribute( 'data-hash' );
-	console.log('toDataElement 3');
-	console.log(domElements);
-	console.log(attributes.jsondata);
-	console.log(mwData);
+	//console.log('toDataElement 3');
+	//console.log(domElements);
+	//console.log(attributes.jsondata);
+	//console.log(mwData);
 
 	attributes.sourceimage = figure && figure.getAttribute( 'data-sourceimage' );
 	attributes.thumbSrc = thumbSrc;
@@ -241,15 +238,15 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		this.storeGeneratedContents( dataElement, domElements, converter.getStore() );
 	}
 
-	console.log('Annotated toDataElement result');
-	console.log(dataElement);
+	//console.log('Annotated toDataElement result');
+	//console.log(dataElement);
 
 	return dataElement;
 };
 
 ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc, converter ) {
-	console.log("AnnotatedImageTransclusionNode.static.toDomElements ");
-	console.log(data);
+	//console.log("AnnotatedImageTransclusionNode.static.toDomElements ");
+	//console.log(data);
 
 	var dataElement = data[ 0 ];
 
@@ -288,9 +285,6 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 		}
 	}
 
-
-	console.log(template);
-
 	var resource = params.resource.wt.replace('./','');
 
 	var dataParsoid = ''; //'{"stx":"html","dsr":[455,563,null,null],"pi":[[{"k":"hash","named":true},{"k":"jsondata","named":true},{"k":"1"},{"k":"2"},{"k":"3"}]]}';
@@ -327,9 +321,8 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 
 	var dataMw = JSON.stringify(dataToStringify);
 
-	console.log('stringit fy data-mw');
-	console.log(dataToStringify);
-	//console.log(dataMw);
+	//console.log('stringit fy data-mw');
+	//console.log(dataToStringify);
 
 	dataMw = '{"parts":[{"template":{"target":{"wt":"#annotatedImageLight:Fichier:Tuto test images Lamp-lasercut 1r.JPG","function":"annotatedImageLight"},"params":{"1":{"wt":"thumbnail"},"2":{"wt":"100px"},"3":{"wt":"right"},"hash":{"wt":""},"jsondata":{"wt":""}},"i":0}}]}';
 
@@ -422,7 +415,7 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
  * "catpion=XXX" set in last params , without prefix 'caption='
  */
 ve.dm.AnnotatedImageTransclusionNode.prototype.getWikitext = function () {
-	console.log("AnnotatedImageTransclusionNode.prototype.getWikitext");
+	//console.log("AnnotatedImageTransclusionNode.prototype.getWikitext");
 	var attrs = this.getAttribute( 'mw' );
 
 	if (attrs.parts[0].template.params.width.wt) {
@@ -430,7 +423,7 @@ ve.dm.AnnotatedImageTransclusionNode.prototype.getWikitext = function () {
 				wt: attrs.parts[0].template.params.width.wt + 'px'
 		};
 	}
-	console.log(attrs);
+	//console.log(attrs);
 
 	var wikitext = this.constructor.static.getWikitext( attrs );
 
@@ -446,7 +439,7 @@ ve.dm.AnnotatedImageTransclusionNode.prototype.getWikitext = function () {
 	}
 	wikitext = wikitext.replace ('}}','|' + caption + '}}');
 
-	console.log(wikitext);
+	//console.log(wikitext);
 	return wikitext;
 };
 
@@ -461,9 +454,9 @@ ve.dm.AnnotatedImageTransclusionNode.prototype.getWikitext = function () {
 ve.ce.AnnotatedImageTransclusionNode.prototype.onParseSuccess = function ( deferred, response) {
 	var contentNodes;
 
-	console.log('AnnotatedImageTransclusionNode.prototype.onParseSuccess');
-	console.log(response);
-	console.log(deferred);
+	//console.log('AnnotatedImageTransclusionNode.prototype.onParseSuccess');
+	//console.log(response);
+	//console.log(deferred);
 
 	if ( ve.getProp( response, 'visualeditor', 'result' ) !== 'success' ) {
 		return this.onParseError( deferred );
@@ -471,7 +464,7 @@ ve.ce.AnnotatedImageTransclusionNode.prototype.onParseSuccess = function ( defer
 
 	// hack : img element are escaped :
 	var html = response.visualeditor.content
-	console.log(html);
+	//console.log(html);
 	var regex1 = new RegExp('\\&lt;img ([^<>]+) /\\&gt;');
 	var regex2 = new RegExp('\\&lt;img ([^<>]+) /(\\&gt;|>)');
 
@@ -481,8 +474,8 @@ ve.ce.AnnotatedImageTransclusionNode.prototype.onParseSuccess = function ( defer
 	// HACK : same for <a> tags escaped by parsoid :
 	var regexLink = new RegExp('\\&lt;a ([^<>]+)(\\&gt;|>)(.+)\\&lt;/a( +)(\\&gt;|>)');
 	html = html.replace(regexLink,"<a $1>$2</a>");
-	console.log('onParseSuccess after link');
-	console.log(html);
+	//console.log('onParseSuccess after link');
+	//console.log(html);
 
 	// Work around https://github.com/jquery/jquery/issues/1997
 	contentNodes = $.parseHTML( html, this.model && this.getModelHtmlDocument() ) || [];

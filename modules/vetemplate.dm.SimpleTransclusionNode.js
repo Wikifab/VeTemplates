@@ -5,8 +5,8 @@
 
 /**
  * DataModel MediaWiki simpletransclusion node.
- * 
- * this represente the node in VE, 
+ *
+ * this represente the node in VE,
  * it contains informations required to match an html node to the simpleTranslusion Type
  *
  * @class
@@ -54,7 +54,7 @@ ve.dm.SimpleTransclusionNode.static.matchFunction = function ( node ) {
 	if ( ! name) {
 		return false;
 	}
-	
+
 	if ( this.matchTemplatesNames.indexOf(name) != -1) {
 		return true
 	};
@@ -72,7 +72,7 @@ ve.dm.SimpleTransclusionNode.static.matchFunction = function ( node ) {
 ve.dm.SimpleTransclusionNode.static.blockType = 'simpleTransclusion';
 
 /**
- * disable slug because there are buggy 
+ * disable slug because there are buggy
  * (slug are div which appair on mouse over to insert new paragraph before or after element)
  */
 ve.dm.SimpleTransclusionNode.prototype.canHaveSlugBefore = function () {
@@ -80,7 +80,7 @@ ve.dm.SimpleTransclusionNode.prototype.canHaveSlugBefore = function () {
 };
 
 ve.dm.SimpleTransclusionNode.prototype.canHaveSlugAfter = function () {
-	return false;
+	return true;
 };
 
 ve.dm.modelRegistry.register( ve.dm.SimpleTransclusionNode );
