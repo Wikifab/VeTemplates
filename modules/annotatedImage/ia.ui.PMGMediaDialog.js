@@ -811,11 +811,12 @@ ve.ui.PMGMediaDialog.prototype.getCaptionFromAttributes = function (attrs) {
 
 	var index = 0;
 
-	if (attrs.caption) {
+	if (typeof attrs.caption !== 'undefined') {
 		return attrs.caption;
 	}
 
 	// look for last numeric index
+	// this should be done only for original Image Model
 	while( attrs[index] != undefined) {
 		index = index + 1;
 	}
@@ -824,8 +825,7 @@ ve.ui.PMGMediaDialog.prototype.getCaptionFromAttributes = function (attrs) {
 	if (index >= 0) {
 		return attrs[index];
 	}
-	console.log('fallback to named caption attr');
-	return attrs.caption;
+	return '';
 }
 
 ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNode) {
