@@ -402,6 +402,10 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 */
 
+	this.mediaUploadBooklet.connect( this, {
+		infoValid: 'onInfoValidCheckName'
+	} );
+
 	// we replace Caption field by an simpler one :
 	this.simpleCaptionTextInput = new OO.ui.TextInputWidget( { spellcheck: true } );
 
@@ -453,6 +457,32 @@ ve.ui.PMGMediaDialog.prototype.onSearchTabsSet = function ( tabPanel ) {
 	}
 };
 
+
+ve.ui.MWMediaDialog.prototype.onInfoValidCheckName = function ( isValid ) {
+	// hack : check filename to remove specialChars "'"
+	// this should be done somewhere else, but we should change mw widget
+
+	//TODO : here we add pagename as prefix, but only if invald chars are found
+
+	var filename = this.mediaUploadBooklet.filenameWidget.getValue();
+	var invaliCharRegex = new RegExp('[\'\"]+', 'g');
+	var invaliCharStrictRegex = new RegExp('[^ a-zA-Z_0-9]+', 'g');
+
+	if (filename.match(invaliCharRegex)) {
+		var pageName = mw.config.get('wgPageName');
+
+		pageName = pageName.replace(invaliCharStrictRegex,'');
+		pageName = pageName.replace(invaliCharRegex,'');
+		filename = filename.replace(invaliCharRegex,'');
+
+		if (filename.search(filename) != -1 && filename.length < 50) {
+			filename = pageName + '_' + filename;
+		}
+
+		this.mediaUploadBooklet.filenameWidget.setValue(filename);
+	}
+	return true;
+};
 
 
 /**
