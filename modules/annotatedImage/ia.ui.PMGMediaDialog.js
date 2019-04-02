@@ -406,6 +406,9 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 		infoValid: 'onInfoValidCheckName'
 	} );
 
+	this.buildPMGSearchPanel();
+
+
 	// we replace Caption field by an simpler one :
 	this.simpleCaptionTextInput = new OO.ui.TextInputWidget( { spellcheck: true } );
 
@@ -434,6 +437,20 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 	this.panels.setItem(currentPanel);
 
 };
+
+ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
+
+	this.searchTabs.addTabPanels( [
+		new OO.ui.TabPanelLayout( 'searchpmg', {
+			label: ve.msg( 'visualeditor-dialog-media-search-tab-search-pmg' )
+		} )
+	] );
+
+	var searchWidget = new ve.ui.PmgSearchWidget();
+
+	this.searchTabs.getTabPanel( 'searchpmg' ).$element.append( searchWidget.$element );
+}
+
 
 /**
  * Handle set events from the search tabs

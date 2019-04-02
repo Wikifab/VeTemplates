@@ -42,6 +42,7 @@
 				"modules/annotatedImage/ia.ce.PMGBlockImageNode.js",
 				"modules/annotatedImage/ia.dm.PMGAnnotatedImageModel.js",
 				"modules/imageAnnotator/ia.dm.AnnotatedImageTransclusionNode.js",
+				"modules/annotatedImage/ia.ui.PmgSearchWidget.js",
 				"modules/annotatedImage/ia.ui.PMGMediaDialog.js",
 				"modules/annotatedImage/ia.ui.PMGMediaDialogTool.js",
 				"modules/imageAnnotator/ia.ui.AnnotatedImageContextItem.js",
