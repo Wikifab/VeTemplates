@@ -266,11 +266,6 @@ ve.ui.PmgSearchWidget.prototype.displayResult = function(results) {
 		return;
 	}*/
 
-	console.log(results);
-	console.log(this.results.$element);
-	console.log(this.results.$element.width() / 3);
-
-
 	for ( i = 0, len = results.search.length; i < len; i++ ) {
 		title = new mw.Title( "File:" + results.search[ i ].filename ).getMainText();
 		// Do not insert duplicates
@@ -280,14 +275,12 @@ ve.ui.PmgSearchWidget.prototype.displayResult = function(results) {
 			var data = {
 					title: "File:" + results.search[ i ].filename ,
 					src: results.search[ i ].fileurl,
+					url: results.search[ i ].url,
 					thumburl: results.search[ i ].thumburl,
 					mediatype: results.search[ i ].mime, // TODO : convert mime type to mediatype
 					width: results.search[ i ].width,
 					height: results.search[ i ].height,
 			};
-			console.log("result:");
-			console.log(results.search[ i ]);
-			console.log(data);
 
 			var resultWidget = new mw.widgets.MediaResultWidget( {
 				data: data,

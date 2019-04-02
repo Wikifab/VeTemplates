@@ -448,6 +448,8 @@ ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
 
 	var searchWidget = new ve.ui.PmgSearchWidget();
 
+	searchWidget.getResults().connect( this, { choose: 'onSearchResultsChoose' } );
+
 	this.searchTabs.getTabPanel( 'searchpmg' ).$element.append( searchWidget.$element );
 }
 
