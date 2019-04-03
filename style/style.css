@@ -35,3 +35,7 @@
 	display:table;
 	clear:both;
 }
+
+.loadMoreButton .oo-ui-buttonElement-button{
+	margin:5px;
+}

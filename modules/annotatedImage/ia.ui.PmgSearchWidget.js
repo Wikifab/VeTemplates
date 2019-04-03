@@ -45,19 +45,36 @@ ve.ui.PmgSearchWidget = function VeUiPmgSearchWidget( config ) {
 	} );
 	this.query.$input.on( 'keydown', this.onQueryKeydown.bind( this ) );
 
-	this.$loader = $( '<div>' ).html('Loading...');
+	this.loadMoreControl = new OO.ui.Element( {
+		classes: [ 'loadMoreControl', 'center' ]
+	} );
+	var loadMoreButton = new OO.ui.ButtonWidget( {
+		label: mw.msg('pmg-load-more-results'),
+		classes: [ 'loadMoreButton' ]
+	} );
+	this.$loadMoreButton =  loadMoreButton.$element;
+	this.loadMoreControl.$element.append( loadMoreButton.$element);
+	this.loadMoreControl.$element.hide();
+
+	loadMoreButton.on( 'click', this.onLoadMoreClick.bind( this ) );
+
+
+
+	this.$loader = $( '<div>' ).html('<i class="fa fa-spin fa-spinner" />').hide();;
+	this.loadMoreControl.$element.append(this.$loader);
 
 	// Initialization
 	this.$query
 		.addClass( 'oo-ui-searchWidget-query' )
 		.append( this.query.$element );
-	this.$query.append(this.$loader);
 	this.$results
 		.addClass( 'oo-ui-searchWidget-results' )
 		.append( this.results.$element );
 	this.$element
 		.addClass( 'oo-ui-searchWidget' )
 		.append( this.$results, this.$query );
+	this.$results
+		.append( this.loadMoreControl.$element );
 };
 
 /* Setup */
@@ -65,6 +82,28 @@ ve.ui.PmgSearchWidget = function VeUiPmgSearchWidget( config ) {
 OO.inheritClass( ve.ui.PmgSearchWidget , OO.ui.Widget );
 
 /* Methods */
+
+
+ve.ui.PmgSearchWidget.prototype.showLoader = function(results) {
+
+	this.$loadMoreButton.hide();
+	this.$loader.show();
+	this.loadMoreControl.$element.show();
+}
+ve.ui.PmgSearchWidget.prototype.hideLoader = function(results) {
+
+	this.$loader.hide();
+}
+ve.ui.PmgSearchWidget.prototype.enableLoadMore = function(results) {
+
+	// we replace button at the end of results before to show it
+	this.$results.append( this.loadMoreControl.$element );
+	this.$loadMoreButton.show();
+	this.loadMoreControl.$element.show();
+}
+ve.ui.PmgSearchWidget.prototype.disableLoadMore = function(results) {
+	this.loadMoreControl.$element.hide();
+}
 
 /**
  * Handle query key down events.
@@ -100,6 +139,7 @@ ve.ui.PmgSearchWidget.prototype.onQueryChange = function () {
 	// Reset
 	this.results.clearItems();
 	this.itemCache = {};
+	this.offset = false;
 	this.browse();
 };
 
@@ -140,7 +180,7 @@ ve.ui.PmgSearchWidget.prototype.getResults = function () {
 
 ve.ui.PmgSearchWidget.prototype.browse = function(input) {
 
-	this.$loader.show(); //show spinner icon
+	this.showLoader(); //show spinner icon
 
 	var searchWidget = this;
 
@@ -156,6 +196,10 @@ ve.ui.PmgSearchWidget.prototype.browse = function(input) {
 	    dataType: 'json',
 	    success: success
 	});
+}
+
+ve.ui.PmgSearchWidget.prototype.onLoadMoreClick = function(jsondata) {
+	this.browse();
 }
 
 ve.ui.PmgSearchWidget.prototype.browseRequest = function(jsondata) {
@@ -199,7 +243,7 @@ ve.ui.PmgSearchWidget.prototype.browseError = function(e) {
 
 ve.ui.PmgSearchWidget.prototype.browseSuccess = function(result) {
 
-	this.$loader.hide(); //show spinner icon
+	this.hideLoader(); //show spinner icon
 
 	if ( result && result.pagemediagallery_browse ) {
 		var results = result.pagemediagallery_browse;
@@ -215,18 +259,15 @@ ve.ui.PmgSearchWidget.prototype.browseSuccess = function(result) {
 			this.appendNoMoreResults();
 		}
 
-		/**
-		 * TODO: manage load more functions...
 		if ( results.continue && results.continue.offset ) {
 
 			this.offset = results.continue.offset;
 
-			this.addScrollEvent();
+			this.enableLoadMore();
 
 		} else {
-			this.disableScrollEvent();
+			this.disableLoadMore();
 		}
-		 */
 
 	}else {
 		this.appendNoMoreResults();
