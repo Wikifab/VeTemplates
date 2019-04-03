@@ -38,6 +38,10 @@ ve.ui.PmgSearchWidget = function VeUiPmgSearchWidget( config ) {
 	this.$query = $( '<div>' );
 	this.$results = $( '<div>' );
 
+	this.hasRunningRequest = false;
+	this.runningRequestQuery = false;
+	this.queuedRequestQuery = false;
+
 	// Events
 	this.query.connect( this, {
 		change: 'onQueryChange',
@@ -135,8 +139,11 @@ ve.ui.PmgSearchWidget.prototype.onQueryKeydown = function ( e ) {
  * @param {string} value New value
  */
 ve.ui.PmgSearchWidget.prototype.onQueryChange = function () {
-	console.log('PmgSearchWidget.onQueryChange');
-	// Reset
+
+	this.browseNew();
+};
+
+ve.ui.PmgSearchWidget.prototype.browseNew = function () {
 	this.results.clearItems();
 	this.itemCache = {};
 	this.offset = false;
@@ -152,7 +159,6 @@ ve.ui.PmgSearchWidget.prototype.onQueryChange = function () {
  * @param {string} value New value
  */
 ve.ui.PmgSearchWidget.prototype.onQueryEnter = function () {
-	console.log('PmgSearchWidget.onQueryEnter');
 	var highlightedItem = this.results.findHighlightedItem();
 	if ( highlightedItem ) {
 		this.results.chooseItem( highlightedItem );
@@ -182,10 +188,22 @@ ve.ui.PmgSearchWidget.prototype.browse = function(input) {
 
 	this.showLoader(); //show spinner icon
 
+
+	this.queuedRequestQuery = this.query.getValue();
+
+	if (this.hasRunningRequest) {
+		return;
+	}
+	this.hasRunningRequest = true;
+	this.runningRequestQuery = this.query.getValue();
+
 	var searchWidget = this;
 
 	function success(jsondata) {
 		searchWidget.browseRequest(jsondata);
+	}
+	function error(jsondata) {
+		searchWidget.browseError(jsondata);
 	}
 
 	// first request to get token
@@ -194,7 +212,8 @@ ve.ui.PmgSearchWidget.prototype.browse = function(input) {
 		url: mw.util.wikiScript('api'),
 		data: { action:'query', format:'json',  meta: 'tokens', type:'csrf'},
 	    dataType: 'json',
-	    success: success
+	    success: success,
+	    error: error
 	});
 }
 
@@ -209,6 +228,7 @@ ve.ui.PmgSearchWidget.prototype.browseRequest = function(jsondata) {
 	data.format = "json";
 	data.input = this.query.getValue();
 	data.token = token;
+
 
 	if ( this.onlyOwnImages ) {
 		data.owner = true;
@@ -238,7 +258,11 @@ ve.ui.PmgSearchWidget.prototype.browseRequest = function(jsondata) {
 }
 
 ve.ui.PmgSearchWidget.prototype.browseError = function(e) {
-	console.log( mw.msg('pmg-error-encountered') );
+	console.log( 'ERROR while browse request' );
+
+	this.queuedRequestQuery = this.query.getValue();
+
+	this.hasRunningRequest = false;
 }
 
 ve.ui.PmgSearchWidget.prototype.browseSuccess = function(result) {
@@ -272,6 +296,15 @@ ve.ui.PmgSearchWidget.prototype.browseSuccess = function(result) {
 	}else {
 		this.appendNoMoreResults();
 	}
+
+
+	this.queuedRequestQuery = this.query.getValue();
+
+	this.hasRunningRequest = false;
+	if ( this.runningRequestQuery != this.queuedRequestQuery) {
+		this.browseNew();
+	}
+
 }
 
 ve.ui.PmgSearchWidget.prototype.appendNoMoreResults = function() {
