@@ -440,9 +440,11 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
 
+	// we remove originals tabs (search an upload) to replace by others :
+	this.searchTabs.clearTabPanels();
 	this.searchTabs.addTabPanels( [
-		new OO.ui.TabPanelLayout( 'searchpmg', {
-			label: ve.msg( 'visualeditor-dialog-media-search-tab-search-pmg' )
+		new OO.ui.TabPanelLayout( 'search', {
+			label: ve.msg( 'visualeditor-dialog-media-search-tab-search' )
 		} )
 	] );
 
@@ -450,7 +452,14 @@ ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
 
 	searchWidget.getResults().connect( this, { choose: 'onSearchResultsChoose' } );
 
-	this.searchTabs.getTabPanel( 'searchpmg' ).$element.append( searchWidget.$element );
+	this.searchTabs.getTabPanel( 'search' ).$element.append( searchWidget.$element );
+
+	this.searchTabs.addTabPanels( [
+		new OO.ui.TabPanelLayout( 'upload', {
+			label: ve.msg( 'visualeditor-dialog-media-search-tab-upload' ),
+			content: [ this.mediaUploadBooklet ]
+		} )
+	] );
 }
 
 
