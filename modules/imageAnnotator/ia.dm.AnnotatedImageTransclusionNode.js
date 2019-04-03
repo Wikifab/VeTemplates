@@ -118,10 +118,7 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDataElement = function ( domElemen
 		if (! img) {
 			var divThumb = divFloatWrapper && findChildren( divFloatWrapper, [ 'div'] )[ 0 ] || null;
 
-//			console.log('must find img');
-//			console.log(imgWrapper);
-//			console.log(divFloatWrapper);
-//			console.log(divThumb);
+			img = $(figure).find('img')[0];
 		}
 	}
 

@@ -932,23 +932,16 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 		elemAtri.src = elemAtri.sourceimage;
 	}
 	elemAtri.caption = this.getCaptionFromAttributes(elemAtri);
-	console.log('getModelAttributesFromNode');
-	console.log(elemAtri);
-	console.log(attrs);
 	Object.assign(attrs, elemAtri);
-	console.log(attrs);
-	if (attrs.size && attrs.width == null) {
+	/*
+	 *
+	 if (attrs.size && attrs.width == null) {
 		attrs.width = attrs.size.replace('px', '');
 		if(attrs.height == null) {
-			attrs.height = attrs.width;
+			delete attrs.height;
 		}
 	}
-	if ( attrs.width == null) {
-		attrs.width = 600;
-	}
-	if ( attrs.height == null) {
-		attrs.height = 450;
-	}
+	*/
 
 	return attrs;
 }
@@ -965,7 +958,6 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 		case 'annotatedImageTransclusion' :
 			var attrs = this.getModelAttributesFromNode(selectedNode);
 			console.log('PMGMediaDialog.prototype.setModelFromNode');
-			console.log(attrs);
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes( attrs, selectedNode.getDocument() )
 			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
