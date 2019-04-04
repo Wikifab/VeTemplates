@@ -805,7 +805,8 @@ ve.ui.PMGMediaDialog.prototype.checkChanged = function () {
 		if (
 			// Activate or deactivate the apply/insert buttons
 			// Make sure sizes are valid first
-			this.sizeWidget.isValid() &&
+			// we do not check size, because it causse issue when crop has changed ratio
+			//this.sizeWidget.isValid() &&
 			(
 				// Check that the model or caption changed
 				this.isInsertion && this.imageModel ||
