@@ -402,6 +402,16 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 */
 
+	// replace mediaUploadBooklet  :
+	this.mediaUploadBooklet = new mw.VeTemplateUpload.BookletLayout( { $overlay: this.$overlay } );
+
+	this.mediaUploadBooklet.connect( this, {
+		set: 'onMediaUploadBookletSet',
+		uploadValid: 'onUploadValid',
+		infoValid: 'onInfoValid',
+		fileUploaded: 'onFileUploaded'
+	} );
+
 	this.mediaUploadBooklet.connect( this, {
 		infoValid: 'onInfoValidCheckName'
 	} );
@@ -485,6 +495,49 @@ ve.ui.PMGMediaDialog.prototype.onSearchTabsSet = function ( tabPanel ) {
 	}
 };
 
+
+ve.ui.MWMediaDialog.prototype.sanitizeFilename = function(filename) {
+
+	// we removed accents :
+	var accent = [
+		/[\300-\306]/g, /[\340-\346]/g, // A, a
+		/[\310-\313]/g, /[\350-\353]/g, // E, e
+		/[\314-\317]/g, /[\354-\357]/g, // I, i
+		/[\322-\330]/g, /[\362-\370]/g, // O, o
+		/[\331-\334]/g, /[\371-\374]/g, // U, u
+		/[\321]/g, /[\361]/g, // N, n
+		/[\307]/g, /[\347]/g, // C, c
+	];
+	var noaccent = [ 'A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N',
+			'n', 'C', 'c' ];
+	for (var i = 0; i < accent.length; i++) {
+		filename = filename.replace(accent[i], noaccent[i]);
+	}
+
+	// var invalidCharRegex = new RegExp('[\'\"]+', 'g');
+	var invalidCharRegex = new RegExp('[^ a-zA-Z_0-9\-\.]+', 'g');
+
+	if (filename.match(invalidCharRegex)) {
+		filename = filename.replace(invalidCharRegex, '');
+	}
+	return filename;
+};
+
+ve.ui.MWMediaDialog.prototype.onFileUploaded = function (  ) {
+	console.log("e.ui.MWMediaDialog.prototype.onFileUploaded");
+
+	// change filename, to prefix with page name :
+	var filename = this.mediaUploadBooklet.getFilename();
+	console.log(filename);
+
+	filename = mw.config.get('wgPageName').replace(/(.*)\//g,"").replace(":","-") + '_' + filename;
+
+	filename = this.sanitizeFilename(filename);
+
+	var filename = this.mediaUploadBooklet.setFilename(filename);
+	console.log(filename);
+	return true;
+};
 
 ve.ui.MWMediaDialog.prototype.onInfoValidCheckName = function ( isValid ) {
 	// hack : check filename to remove specialChars "'"
