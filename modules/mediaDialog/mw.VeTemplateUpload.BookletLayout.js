@@ -310,11 +310,106 @@
 		} );
 	};
 
+
+	mw.VeTemplateUpload.BookletLayout.prototype.sanitizeFilename = function(filename) {
+
+		// we removed accents :
+		var accent = [
+			/[\300-\306]/g, /[\340-\346]/g, // A, a
+			/[\310-\313]/g, /[\350-\353]/g, // E, e
+			/[\314-\317]/g, /[\354-\357]/g, // I, i
+			/[\322-\330]/g, /[\362-\370]/g, // O, o
+			/[\331-\334]/g, /[\371-\374]/g, // U, u
+			/[\321]/g, /[\361]/g, // N, n
+			/[\307]/g, /[\347]/g, // C, c
+		];
+		var noaccent = [ 'A', 'a', 'E', 'e', 'I', 'i', 'O', 'o', 'U', 'u', 'N',
+				'n', 'C', 'c' ];
+		for (var i = 0; i < accent.length; i++) {
+			filename = filename.replace(accent[i], noaccent[i]);
+		}
+
+		// var invalidCharRegex = new RegExp('[\'\"]+', 'g');
+		var invalidCharRegex = new RegExp('[^ a-zA-Z_0-9\-\.]+', 'g');
+
+		if (filename.match(invalidCharRegex)) {
+			filename = filename.replace(invalidCharRegex, '');
+		}
+		return filename;
+	};
+
+	mw.VeTemplateUpload.BookletLayout.prototype.prefixAndSanitizeFilename = function (filename) {
+		// change filename, to prefix with page name :
+		filename = mw.config.get('wgPageName').replace(/(.*)\//g,"").replace(":","-") + '_' + filename;
+
+		filename = this.sanitizeFilename(filename);
+
+		return filename;
+	};
+
 	/**
 	 * @param {mw.Title} filename
 	 * @return {jQuery.Promise} Resolves (on success) or rejects with OO.ui.Error
 	 */
-	mw.VeTemplateUpload.BookletLayout.prototype.validateFilename = function ( filename ) {
+	mw.VeTemplateUpload.BookletLayout.prototype.generateFilename = function ( filename ) {
+		// apfrom=Test%20dedie%20au%20erreurs%20Logo&apto=Test%20dedie%20au%20erreurs%20Logozz
+
+		var booklet = this;
+		filename = this.prefixAndSanitizeFilename(filename);
+
+		// new call : search for all files with same prefix, with a number as suffix
+		return ( new mw.Api() ).get( {
+			action: 'query',
+			prop: 'info',
+			list: 'allpages',
+			apnamespace: mw.config.get( 'wgNamespaceIds' ).file,
+			apfrom: filename,
+			apto: filename + "a",
+			formatversion: 2
+		} ).then(
+			function ( result ) {
+				// if the file already exists, reject right away, before
+				// ever firing finishStashUpload()
+				if ( result.query.allpages.length > 0 ) {
+
+					// change file name :
+					var filenames = result.query.allpages.map(function (value) {
+						// remove namespace prefix :
+						value = value.title.replace(/^([^:]+:)/, '');
+						return value;
+					});
+
+					if (jQuery.inArray(filename,filenames ) !== -1) {
+
+						// rename file by adding a number
+						// TODO : calc number according to number of the last one +1
+						var newFilename = filename + '_' + (result.query.allpages.length + 1);
+						var extensionRegexp = /(\.[^\.]+)$/;
+						if (filename.match(extensionRegexp)) {
+							newFilename = filename.replace(extensionRegexp, '_' + (result.query.allpages.length + 1) + '$1');
+						}
+						booklet.setFilename(newFilename);
+					} else {
+						booklet.setFilename(filename);
+					}
+				} else {
+					booklet.setFilename(filename);
+				}
+				return $.Deferred().resolve();
+			},
+			function () {
+				// API call failed - this could be a connection hiccup...
+				// Let's just ignore this validation step and turn this
+				// failure into a successful resolve ;)
+				booklet.setFilename(filename);
+				return $.Deferred().resolve();
+			}
+		);
+	};
+
+
+	mw.VeTemplateUpload.BookletLayout.prototype.validateFilenameExists = function ( filename ) {
+		// old call from validateFilename : just name file existence :
 		return ( new mw.Api() ).get( {
 			action: 'query',
 			prop: 'info',
@@ -322,6 +417,8 @@
 			formatversion: 2
 		} ).then(
 			function ( result ) {
+				console.log("BookletLayout.prototype.validateFilename");
+				console.log(result);
 				// if the file already exists, reject right away, before
 				// ever firing finishStashUpload()
 				if ( !result.query.pages[ 0 ].missing ) {
@@ -338,7 +435,7 @@
 				return $.Deferred().resolve();
 			}
 		);
-	};
+	}
 
 	/**
 	 * @inheritdoc
