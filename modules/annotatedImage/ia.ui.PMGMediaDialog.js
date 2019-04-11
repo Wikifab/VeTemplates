@@ -632,7 +632,7 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 		$main = $( '<div>' )
 			.addClass( 've-ui-mwMediaDialog-panel-imageeditor-main' ),
 		$image = $( '<img>' ).addClass('imageeditor-sourceimg'),
-		$editorContainer = $( '<div>' );
+		$editorContainer = $( '<div>' ).addClass('imageeditor-editorContainer');
 
 	// Main section - title
 	$main.append(
@@ -899,6 +899,7 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 
 	var options = [];
 	options['no-controlbar'] = true;
+	options['custom-dimensions'] = currentDim;
 
 	this.imageAnnotationEditor = mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback, options);
 
@@ -1143,7 +1144,7 @@ ve.ui.PMGMediaDialog.prototype.switchPanels = function ( panel, stopSearchRequer
 			this.search.runLayoutQueue();
 			break;
 		case 'annotate':
-			this.setSize( 'large' );
+			this.setSize( 'full' );
 			// Set the edit panel
 			this.panels.setItem( this.mediaImageAnnotationPanel );
 			// Hide/show buttons

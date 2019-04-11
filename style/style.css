@@ -25,9 +25,13 @@
   background-image: -o-linear-gradient(transparent, transparent), url('icons/caution-icon.png');
 }
 
+.ve-ui-mwMediaDialog-panel-imageeditor-wrapper{
+	background:#EEEEEE;
+	height:100%
+	
+}
+
 .ve-ui-mwMediaDialog-panel-imageeditor-editor {
-	width:600px;
-	margin:0 auto;
 }
 
 .ve-ce-documentNode:after {
