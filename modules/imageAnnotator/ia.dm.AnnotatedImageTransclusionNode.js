@@ -378,9 +378,6 @@ ve.dm.AnnotatedImageTransclusionNode.static.toDomElements = function ( data, doc
 		img.setAttribute( 'alt', params.alt.wt );
 	}
 
-	console.log('img dom generated');
-	console.log(img);
-
 
 	wrapper.appendChild( imgWrapper );
 
