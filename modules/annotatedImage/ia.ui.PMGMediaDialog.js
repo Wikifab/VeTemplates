@@ -749,8 +749,8 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 					width: info.thumbwidth,
 					height: info.thumbheight,
 					mediaType: info.mediatype,
-					type: 'thumb',
-					align: 'none',
+					type: 'frameless',
+					align: 'center',
 					defaultSize: true
 				},
 				this.getFragment().getDocument()
