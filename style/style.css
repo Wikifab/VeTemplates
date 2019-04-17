@@ -43,3 +43,65 @@
 .loadMoreButton .oo-ui-buttonElement-button{
 	margin:5px;
 }
+
+/* Start PageMediaGallery Style */
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-searchWidget-query .oo-ui-textInputWidget {
+  max-width: 100%;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mwMediaDialog-panel-imageinfo-main {
+  margin-bottom: 0;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mwMediaDialog-panel-imageinfo-main .ve-ui-mwMediaDialog-panel-imageinfo-title {
+  font-size: 1.2em;
+  margin-bottom: 2px;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mwMediaDialog-panel-imageinfo-details .ve-ui-mwMediaInfoFieldWidget:last-child {
+  display:none;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-window-head .oo-ui-processDialog-actions-primary .oo-ui-buttonElement-button {
+    font-weight: bold;
+    padding: 9px 13px;
+    border: 0;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mediaSizeWidget-section-custom {
+    margin: 0 0 10px;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldLayout-align-inline {
+  margin-top:0;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mediaSizeWidget-section-custom .oo-ui-fieldLayout-header,
+.ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mwMediaDialog-borderCheckbox,
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldsetLayout legend .oo-ui-icon-parameter {
+  display: none;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-checkboxInputWidget [type='checkbox'] {
+  vertical-align: 1px;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldsetLayout legend .oo-ui-labelElement-label {
+    padding-left: 0;
+    display: block;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-menuLayout-content .oo-ui-pageLayout:first-child .oo-ui-fieldsetLayout:first-child legend .oo-ui-labelElement-label {
+      padding-left: 1.625em;
+}
+
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldsetLayout legend .oo-ui-fieldsetLayout-help {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/* End of PageMediaGallery Style */
