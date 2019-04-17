@@ -167,7 +167,7 @@ ve.ui.PMGMediaDialog.prototype.setCaption = function (caption) {
 ve.ui.PMGMediaDialog.prototype.initialize = function () {
 	var altTextFieldset, positionFieldset, borderField, positionField;
 
-	console.log("PMGMediaDialog.prototype.initialize");
+	//console.log("PMGMediaDialog.prototype.initialize");
 
 	// Parent method
 	ve.ui.PMGMediaDialog.super.prototype.initialize.call( this );
@@ -597,8 +597,8 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 
 	this.$imageEditorPanelWrapper.empty();
 
-	console.log("PMGMediaDialog.prototype.buildImageEditorPanel ");
-	console.log(imageinfo);
+	//console.log("PMGMediaDialog.prototype.buildImageEditorPanel ");
+	//console.log(imageinfo);
 
 	// hack : if no image info, we build one :
 	// (case when editing an existing image)
@@ -616,7 +616,7 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
 			console.log('Warning : no current dimension');
 		}
 	}
-	console.log(imageinfo);
+	//console.log(imageinfo);
 
 	var imageTitleText = imageinfo.title || imageinfo.canonicaltitle,
 		imageTitle = new OO.ui.LabelWidget( {
@@ -714,8 +714,6 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
  * @param {Object} info Image info
  */
 ve.ui.PMGMediaDialog.prototype.chooseImageInfo = function ( info ) {
-	console.log('chooseImageInfo');
-	console.log(info);
 	this.$infoPanelWrapper.empty();
 	// Switch panels
 	this.selectedImageInfo = info;
@@ -736,8 +734,6 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		obj = {},
 		info = this.selectedImageInfo;
 
-	console.log("confirmSelectedImage");
-	console.log(info);
 	if ( info ) {
 		imageTitleText = info.title || info.canonicaltitle;
 		// Run title through mw.Title so the File: prefix is localised
@@ -754,7 +750,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 					height: info.thumbheight,
 					mediaType: info.mediatype,
 					type: 'thumb',
-					align: 'default',
+					align: 'none',
 					defaultSize: true
 				},
 				this.getFragment().getDocument()
@@ -864,8 +860,6 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	var thumbGenerated = function  (url, thumbData) {
 		// TODO : change img src attribut
 		//mediaDialog.imageModel.setThumbUrl(url);
-		console.log("thumbGenerated");
-		console.log(thumbData);
 		mediaDialog.imageModel.imageSrc = url;
 		mediaDialog.hash = thumbData.hash;
 		mediaDialog.waitingGeneration = false;
@@ -891,11 +885,7 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 		mediaDialog.switchPanels( 'edit' );
 	}
 
-	console.log('startImageEditor');
 	var currentDim = this.imageModel.getCurrentDimensions();
-
-	console.log(currentDim);
-	console.log(img);
 
 	var options = [];
 	options['no-controlbar'] = true;
@@ -931,8 +921,6 @@ ve.ui.PMGMediaDialog.prototype.getModelAttributesFromNode = function (selectedNo
 	// should be :
 	// atrts = selectedNode.getAttributes();
 
-	console.log("PMG getModelAttributesFromNode");
-	console.log(selectedNode);
 	var elemAtri = selectedNode.getAttributes();
 	var attrs = {};
 
@@ -987,7 +975,6 @@ ve.ui.PMGMediaDialog.prototype.setModelFromNode = function ( selectedNode) {
 	switch(selectedNode.type) {
 		case 'annotatedImageTransclusion' :
 			var attrs = this.getModelAttributesFromNode(selectedNode);
-			console.log('PMGMediaDialog.prototype.setModelFromNode');
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes( attrs, selectedNode.getDocument() )
 			//this.imageModel = ve.dm.MWImageModel.static.newFromImage( this.selectedNode );
 			attributes = this.selectedNode.getAttributes();
@@ -1222,8 +1209,6 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 	// Size widget
 
 	this.sizeErrorLabel.toggle( false );
-	console.log("attachImageModel");
-	console.log(this.imageModel.getScalable());
 	var scalableObject = this.imageModel.getScalable();
 	if ( ! scalableObject.getCurrentDimensions()) {
 		console.log('Warning : dimensions empty');
@@ -1277,7 +1262,7 @@ ve.ui.PMGMediaDialog.prototype.basename = function (path) {
 ve.ui.PMGMediaDialog.prototype.getData = function () {
 
 
-	console.log('PMGMediaDialog.prototype.getData ');
+	//console.log('PMGMediaDialog.prototype.getData ');
 	//var resource = 'File:Desklamp_lasercut.jpg';
 
 	var resource = '';
@@ -1336,8 +1321,8 @@ ve.ui.PMGMediaDialog.prototype.getData = function () {
 		type: '/annotatedImageTransclusion'
 		//type: '/simpleTransclusion',
 	} ];
-	console.log('PMGMediaDialog.prototype.getData result');
-	console.log(data);
+	//console.log('PMGMediaDialog.prototype.getData result');
+	//console.log(data);
 
 	return data;
 }
@@ -1390,9 +1375,6 @@ ve.ui.PMGMediaDialog.prototype.insertAnnotatedImageNode = function ( ) {
 	}
 
 	contentToInsert = this.getData();
-
-	console.log("insertAnnotatedImageNode");
-	console.log(contentToInsert);
 
 	switch ( nodeType ) {
 		case 'mwInlineImage':
@@ -1554,7 +1536,7 @@ ve.ui.windowFactory.register( ve.ui.PMGMediaDialog );
  */
 ve.ui.MWMediaDialog.prototype.getReadyProcess = function ( data ) {
 
-	console.log('MWMediaDialog.prototype.getReadyProcess hacked');
+	//console.log('MWMediaDialog.prototype.getReadyProcess hacked');
 	return ve.ui.MWMediaDialog.super.prototype.getReadyProcess.call( this, data )
 		.next( function () {
 

@@ -51,13 +51,15 @@
 				"modules/imageAnnotator/ia.ui.AnnotatedImageDialog.js",
 				"modules/annotatedImage/ve.ui.PMGAnnnotatedMediaContextItem.js",
 				"modules/imageAnnotator/iaTemplateRegister.js",
+				"modules/ve.ui.MediaSizeWidget.js",
 				"modules/vetemplates.init.js"
 			],
 			"dependencies": [
 				"ext.visualEditor.core",
 				"ext.visualEditor.mwtransclusion",
 				"ext.visualEditor.mwimage",
-				"ext.vetemplates.css"
+				"ext.vetemplates.css",
+				"ext.imageannotator.editor"
 			],
 			"messages": [
 				"vetemplate-dialog-annotatedimage-title",
