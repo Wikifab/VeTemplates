@@ -79,8 +79,9 @@
 
 .ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mediaSizeWidget-section-custom .oo-ui-fieldLayout-header,
 .ve-ui-overlay .ve-ui-pMGMediaDialog .ve-ui-mwMediaDialog-borderCheckbox,
-.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldsetLayout legend .oo-ui-icon-parameter {
-  display: none;
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldsetLayout legend .oo-ui-icon-parameter,
+.ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-buttonElement-frameless.oo-ui-iconElement > .oo-ui-buttonElement-button {
+  display: none !important;
 }
 
 .ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-checkboxInputWidget [type='checkbox'] {
@@ -95,7 +96,8 @@
 }
 
 .ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-menuLayout-content .oo-ui-pageLayout:first-child .oo-ui-fieldsetLayout:first-child legend .oo-ui-labelElement-label {
-      padding-left: 1.625em;
+    padding-left: 1.625em;
+    margin-bottom: 20px;
 }
 
 .ve-ui-overlay .ve-ui-pMGMediaDialog .oo-ui-fieldsetLayout legend .oo-ui-fieldsetLayout-help {
