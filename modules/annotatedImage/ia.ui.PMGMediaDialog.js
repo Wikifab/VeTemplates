@@ -739,6 +739,10 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		// Run title through mw.Title so the File: prefix is localised
 		title = mw.Title.newFromText( imageTitleText ).getPrefixedText();
 		if ( !this.imageModel ) {
+
+			var width = Math.min(info.width, 1094);
+			var height = Math.round(info.height * (/* scale */width / info.width));
+
 			// Create a new image model based on default attributes
 			this.imageModel = ve.dm.MWImageModel.static.newFromImageAttributes(
 				{
@@ -746,12 +750,12 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 					href: './' + title,
 					src: info.url,
 					resource: './' + title,
-					width: info.width,
-					height: info.height,
+					width: width,
+					height: height,
 					mediaType: info.mediatype,
 					type: 'frameless',
 					align: 'center',
-					defaultSize: true
+					defaultSize: false
 				},
 				this.getFragment().getDocument()
 			);
@@ -1157,17 +1161,17 @@ ve.ui.PMGMediaDialog.prototype.getCurrentDimensions = function () {
 
 	if (result == null) {
 		result = {
-			width: 600,
-			height: 450
+			width: 1094,
+			height: 821
 		}
 	}
 	if ( ! result.width) {
 		console.log('getCurrentDimensions set missing width');
-		result.width = 600;
+		result.width = 1094;
 	}
 	if ( ! result.height) {
 		console.log('getCurrentDimensions set missing height');
-		result.height = 450;
+		result.height = 821;
 	}
 	return result;
 }
