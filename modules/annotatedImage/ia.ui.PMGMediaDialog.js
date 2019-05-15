@@ -894,6 +894,7 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	var options = [];
 	options['no-controlbar'] = true;
 	options['custom-dimensions'] = currentDim;
+	options['free-cropping'] = true;
 
 	this.imageAnnotationEditor = mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback, options);
 
