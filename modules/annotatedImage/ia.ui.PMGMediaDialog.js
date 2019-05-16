@@ -895,6 +895,7 @@ ve.ui.PMGMediaDialog.prototype.startImageEditor = function () {
 	var options = [];
 	options['no-controlbar'] = true;
 	options['custom-dimensions'] = currentDim;
+	options['free-cropping'] = true;
 
 	this.imageAnnotationEditor = mw.ext_imageAnnotator.createNewEditor(this.$editorContainer, img, this.getJsonData(), updateCallback, options);
 
@@ -1215,6 +1216,27 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 
 	this.sizeErrorLabel.toggle( false );
 	var scalableObject = this.imageModel.getScalable();
+	var sizeWidget = this.sizeWidget;
+
+	// override this function to add a limit to width
+	scalableObject.isCurrentDimensionsValid = function() {
+		
+		var dimensions = this.getCurrentDimensions();
+		var width_limit_valid = (dimensions.width <= 1094);
+		var isCurrentDimensionsValid_parent = ve.dm.Scalable.prototype.isCurrentDimensionsValid.call(this);
+
+		if (!width_limit_valid) {
+			// we're gonna show a more explicit message to the user 
+			var original_label = sizeWidget.errorLabel.getLabel();
+			sizeWidget.errorLabel.setLabel( ve.msg( 'visualeditor-mediasizewidget-label-width-limit-error', 1094) );
+		} else if (!isCurrentDimensionsValid_parent) {
+			// this is the default message which we're going to change
+			sizeWidget.errorLabel.setLabel( ve.msg( 'visualeditor-mediasizewidget-label-defaulterror' ) );
+		}
+
+		return width_limit_valid && isCurrentDimensionsValid_parent;
+	};
+
 	if ( ! scalableObject.getCurrentDimensions()) {
 		console.log('Warning : dimensions empty');
 		scalableObject.setCurrentDimensions(this.getCurrentDimensions());

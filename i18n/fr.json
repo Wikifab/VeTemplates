@@ -20,5 +20,6 @@
 	"vetemplate-templatetitle-idea": "Donner une idée",
 	"vetemplate-templatetitle-info": "Donner une information complémentaire",
 	"vetemplate-templatetitle-pin": "Inviter à la mémorisation",
-	"vetemplate-templatetitle-warning": "Prévenir d'un danger"
+	"vetemplate-templatetitle-warning": "Prévenir d'un danger",
+	"visualeditor-mediasizewidget-label-width-limit-error": "Largeur limite : $1."
 }
