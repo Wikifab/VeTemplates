@@ -31,6 +31,7 @@ ve.ui.PMGMediaDialog = function VeUiPMGMediaDialog( config ) {
 	this.searchCache = {};
 	this.jsonDataHasBeenModified = false;
 	this.waitingGeneration = false;
+	this.widthLimit = 1094;
 
 	this.$element.addClass( 've-ui-mwMediaDialog' );
 	this.$element.addClass( 've-ui-pMGMediaDialog' );
@@ -800,7 +801,7 @@ ve.ui.PMGMediaDialog.prototype.confirmSelectedImage = function () {
 		title = mw.Title.newFromText( imageTitleText ).getPrefixedText();
 		if ( !this.imageModel ) {
 
-			var width = Math.min(info.width, 1094);
+			var width = Math.min(info.width, this.widthLimit);
 			var height = Math.round(info.height * (/* scale */width / info.width));
 
 			// Create a new image model based on default attributes
@@ -1222,13 +1223,13 @@ ve.ui.PMGMediaDialog.prototype.getCurrentDimensions = function () {
 
 	if (result == null) {
 		result = {
-			width: 1094,
+			width: this.widthLimit,
 			height: 821
 		}
 	}
 	if ( ! result.width) {
 		console.log('getCurrentDimensions set missing width');
-		result.width = 1094;
+		result.width = this.widthLimit;
 	}
 	if ( ! result.height) {
 		console.log('getCurrentDimensions set missing height');
