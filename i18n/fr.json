@@ -21,5 +21,6 @@
 	"vetemplate-templatetitle-info": "Donner une information complémentaire",
 	"vetemplate-templatetitle-pin": "Inviter à la mémorisation",
 	"vetemplate-templatetitle-warning": "Prévenir d'un danger",
-	"visualeditor-mediasizewidget-label-width-limit-error": "Largeur limite : $1."
+	"visualeditor-mediasizewidget-label-width-limit-error": "Largeur limite : $1.",
+	"pmgmediadialog-fileexists": "Ce fichier existe déjà (voir ci-dessous). Souhaitez-vous utiliser l'existant?"
 }
