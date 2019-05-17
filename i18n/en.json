@@ -20,5 +20,6 @@
 	"vetemplate-templatetitle-idea": "Give an idea",
 	"vetemplate-templatetitle-info": "Give additional information",
 	"vetemplate-templatetitle-pin": "Invite to memorize",
-	"vetemplate-templatetitle-warning": "Prevent a danger"
+	"vetemplate-templatetitle-warning": "Prevent a danger",
+	"pmgmediadialog-fileexists": "File already exists (see below). Do you want to use it?"
 }

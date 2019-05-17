@@ -77,7 +77,8 @@
 				"vetemplate-templatetitle-idea",
 				"vetemplate-templatetitle-info",
 				"vetemplate-templatetitle-pin",
-				"vetemplate-templatetitle-warning"
+				"vetemplate-templatetitle-warning",
+				"pmgmediadialog-fileexists"
 			]
 		}
 	},

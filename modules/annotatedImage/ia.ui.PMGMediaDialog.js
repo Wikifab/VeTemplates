@@ -448,6 +448,45 @@ ve.ui.PMGMediaDialog.prototype.initialize = function () {
 
 };
 
+/**
+ * Handle panelNameSet events from the upload stack
+ *
+ * @param {OO.ui.PageLayout} page Current page
+ */
+ve.ui.PMGMediaDialog.prototype.onMediaUploadBookletSet = function ( page ) {
+	this.uploadPageNameSet( page.getName() );
+};
+
+/**
+ * The upload booklet's page name has changed
+ *
+ * @param {string} pageName Page name
+ */
+ve.ui.PMGMediaDialog.prototype.uploadPageNameSet = function ( pageName ) {
+	var imageInfo;
+	if ( pageName === 'insert' ) {
+
+		var mediaUploadBooklet = this.mediaUploadBooklet,
+			upload = mediaUploadBooklet.upload,
+			state = upload.getState(),
+			stateDetails = upload.getStateDetails();
+
+		// file exists : let the user decide whether to use the existing file
+		if (state === mw.Upload.State.WARNING && stateDetails.fileexists != undefined) {
+			imageInfo = stateDetails.existingfile;
+			this.chooseExistingImageInfo( imageInfo );
+		} else { // uploaded file
+			imageInfo = this.mediaUploadBooklet.upload.getImageInfo();
+			this.chooseImageInfo( imageInfo );
+		}
+	} else {
+		// Hide the tabs after the first page
+		this.searchTabs.toggleMenu( pageName === 'upload' );
+
+		this.actions.setMode( 'upload-' + pageName );
+	}
+};
+
 ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
 
 	// we remove originals tabs (search an upload) to replace by others :
@@ -713,7 +752,28 @@ ve.ui.PMGMediaDialog.prototype.buildImageEditorPanel = function ( imageinfo ) {
  *
  * @param {Object} info Image info
  */
+ve.ui.PMGMediaDialog.prototype.chooseExistingImageInfo = function ( info ) {
+
+	this.$infoPanelWrapper.empty();
+
+	this.$infoPanelWrapper.append('<div class="fileexists">' + ve.msg( 'pmgmediadialog-fileexists' ) + '</div>' );
+	// Switch panels
+	this.selectedImageInfo = info;
+	this.switchPanels( 'imageInfo' );
+	// Build info panel
+	this.buildMediaInfoPanel( info );
+	// Build editor panel
+	this.buildImageEditorPanel( info );
+
+};
+
+/**
+ * Choose image info for editing
+ *
+ * @param {Object} info Image info
+ */
 ve.ui.PMGMediaDialog.prototype.chooseImageInfo = function ( info ) {
+
 	this.$infoPanelWrapper.empty();
 	// Switch panels
 	this.selectedImageInfo = info;
