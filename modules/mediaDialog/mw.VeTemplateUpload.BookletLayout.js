@@ -459,8 +459,6 @@
 
 					// set the upload object state to warning and save the file's info for future use
 					layout.upload.setState( mw.Upload.State.WARNING, { fileexists: true, existingfile: imageInfo } );
-					layout.upload.state = 1; // warning
-					layout.existingFileInfo = imageInfo;
 					layout.setPage( 'insert' );
 
 					return $.Deferred().resolve();
