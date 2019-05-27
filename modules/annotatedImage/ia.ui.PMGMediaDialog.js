@@ -1162,9 +1162,17 @@ ve.ui.PMGMediaDialog.prototype.getCurrentDimensions = function () {
 	var result = this.imageModel.getCurrentDimensions();
 
 	if (result == null) {
+		// we should let this empty, to set size widget to 'default' size
+		// but this mays produce bugs when size is empty
 		result = {
 			width: this.widthLimit,
 			height: 821
+		}
+		if (this.selectedImageInfo && this.selectedImageInfo.width) {
+			result.width = this.selectedImageInfo.width;
+		}
+		if (this.selectedImageInfo && this.selectedImageInfo.height) {
+			result.height = this.selectedImageInfo.height;
 		}
 	}
 	if ( ! result.width) {
@@ -1220,13 +1228,13 @@ ve.ui.PMGMediaDialog.prototype.attachImageModel = function () {
 
 	// override this function to add a limit to width
 	scalableObject.isCurrentDimensionsValid = function() {
-		
+
 		var dimensions = this.getCurrentDimensions();
 		var width_limit_valid = (dimensions.width <= 1094);
 		var isCurrentDimensionsValid_parent = ve.dm.Scalable.prototype.isCurrentDimensionsValid.call(this);
 
 		if (!width_limit_valid) {
-			// we're gonna show a more explicit message to the user 
+			// we're gonna show a more explicit message to the user
 			var original_label = sizeWidget.errorLabel.getLabel();
 			sizeWidget.errorLabel.setLabel( ve.msg( 'visualeditor-mediasizewidget-label-width-limit-error', 1094) );
 		} else if (!isCurrentDimensionsValid_parent) {
