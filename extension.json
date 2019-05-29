@@ -78,7 +78,8 @@
 				"vetemplate-templatetitle-info",
 				"vetemplate-templatetitle-pin",
 				"vetemplate-templatetitle-warning",
-				"visualeditor-mediasizewidget-label-width-limit-error"
+				"visualeditor-mediasizewidget-label-width-limit-error",
+				"pmgmediadialog-fileexists"
 			]
 		}
 	},

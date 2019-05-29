@@ -417,8 +417,6 @@
 			formatversion: 2
 		} ).then(
 			function ( result ) {
-				console.log("BookletLayout.prototype.validateFilename");
-				console.log(result);
 				// if the file already exists, reject right away, before
 				// ever firing finishStashUpload()
 				if ( !result.query.pages[ 0 ].missing ) {
@@ -436,6 +434,62 @@
 			}
 		);
 	}
+
+	/**
+	 * @param {mw.Title} filename
+	 * @return {jQuery.Promise} Resolves (on success) or rejects with OO.ui.Error
+	 */
+	mw.VeTemplateUpload.BookletLayout.prototype.validateFilename = function ( filename ) {
+
+		var layout = this;
+
+		return ( new mw.Api() ).get( {
+			action: 'query',
+			prop: 'imageinfo',
+			titles: filename.getPrefixedDb(),
+			formatversion: 2,
+			iiprop: 'timestamp|user|url|mediatype|mime|userid|comment|parsedcomment|canonicaltitle|size|dimensions|sha1|thumbmime|metadata|commonmetadata|extmetadata|archivename|bitdepth|uploadwarning|badfile'
+		} ).then(
+			function ( result ) {
+				// if the file already exists
+				if ( !result.query.pages[ 0 ].missing ) {
+
+					// the existing file's info
+					imageInfo = result.query.pages[0].imageinfo[0];
+
+					// set the upload object state to warning and save the file's info for future use
+					layout.upload.setState( mw.Upload.State.WARNING, { fileexists: true, existingfile: imageInfo } );
+					layout.setPage( 'insert' );
+
+					return $.Deferred().resolve();
+				}
+			},
+			function () {
+				// API call failed - this could be a connection hiccup...
+				// Let's just ignore this validation step and turn this
+				// failure into a successful resolve ;)
+				return $.Deferred().resolve();
+			}
+		);
+	};
+
+	/**
+	 * @inheritdoc
+	 */
+	mw.VeTemplateUpload.BookletLayout.prototype.saveFile = function () {
+
+		var title = mw.Title.newFromText(
+			this.getFilename(),
+			mw.config.get( 'wgNamespaceIds' ).file
+		);
+
+		return this.uploadPromise
+			/* use our own validateFileName function */
+			.then( this.validateFilename.bind( this, title ) )
+			/* if everything went fine until here, let the parent have a word */
+			.done( mw.ForeignStructuredUpload.BookletLayout.parent.prototype.saveFile.bind( this ) );
+	};
+
 
 	/**
 	 * @inheritdoc
