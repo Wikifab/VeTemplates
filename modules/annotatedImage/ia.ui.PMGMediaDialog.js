@@ -765,7 +765,6 @@ ve.ui.PMGMediaDialog.prototype.chooseExistingImageInfo = function ( info ) {
 	this.buildMediaInfoPanel( info );
 	// Build editor panel
 	this.buildImageEditorPanel( info );
-
 };
 
 /**

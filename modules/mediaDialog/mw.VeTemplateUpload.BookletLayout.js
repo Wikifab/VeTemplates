@@ -443,19 +443,39 @@
 
 		var layout = this;
 
-		return ( new mw.Api() ).get( {
-			action: 'query',
-			prop: 'imageinfo',
-			titles: filename.getPrefixedDb(),
-			formatversion: 2,
-			iiprop: 'timestamp|user|url|mediatype|mime|userid|comment|parsedcomment|canonicaltitle|size|dimensions|sha1|thumbmime|metadata|commonmetadata|extmetadata|archivename|bitdepth|uploadwarning|badfile'
-		} ).then(
-			function ( result ) {
-				// if the file already exists
-				if ( !result.query.pages[ 0 ].missing ) {
+		var file = this.getFile();
 
-					// the existing file's info
-					imageInfo = result.query.pages[0].imageinfo[0];
+		// first request to get token
+		$.ajax({
+			type: "GET",
+			url: mw.util.wikiScript('api'),
+			data: { action:'query', format:'json',  meta: 'tokens', type:'csrf'},
+		    dataType: 'json',
+		    success: onTokenSuccess
+		});
+
+		function onTokenSuccess( jsondata ) {
+
+			var token = jsondata.query.tokens.csrftoken;
+			var formdata = new FormData(); //see https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
+			formdata.append("action", "vetemplates_checkfileexists");
+			formdata.append("format", "json");
+			formdata.append("filename", filename);
+			formdata.append("token", token );
+			formdata.append("file", file);
+
+			$.ajax({ 
+				type: "POST",
+				url: mw.util.wikiScript('api'),
+				data: formdata,
+    			processData: false,
+    			contentType:false
+    		}).done(function(res) {
+				var dupes = res.vetemplates_checkfileexists;
+
+				if (typeof dupes !== 'undefined' && dupes.length > 0) {
+
+					var imageInfo = dupes[0];
 
 					// set the upload object state to warning and save the file's info for future use
 					layout.upload.setState( mw.Upload.State.WARNING, { fileexists: true, existingfile: imageInfo } );
@@ -463,14 +483,16 @@
 
 					return $.Deferred().resolve();
 				}
-			},
-			function () {
-				// API call failed - this could be a connection hiccup...
-				// Let's just ignore this validation step and turn this
-				// failure into a successful resolve ;)
+
 				return $.Deferred().resolve();
-			}
-		);
+			})
+			.fail(function(xhr, ajaxOptions, thrownError) {
+				// console.log("error");
+				// console.log(xhr);
+				// console.log(thrownError);
+				return $.Deferred().resolve();
+			});
+		}
 	};
 
 	/**
