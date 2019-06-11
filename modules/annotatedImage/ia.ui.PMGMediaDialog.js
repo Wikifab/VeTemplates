@@ -1127,6 +1127,21 @@ ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
 				this.isInsertion = false;
 				// Create image model
 				this.setModelFromNode(this.selectedNode);
+				if (this.imageModel.attributesCache.size) {
+					// fix issue : dimension bug when empty :
+					var scalableObject = this.imageModel.getScalable();
+					if (! scalableObject.getCurrentDimensions()) {
+						var ratio = scalableObject.ratio || 0.75;
+						var dim = {
+								width: parseInt(this.imageModel.attributesCache.size.replace('px','')),
+								height: 300
+						}
+						dim.height = parseInt(dim.width * ratio);
+						console.log("fix dimensions : ");
+						console.log(dim);
+						scalableObject.setCurrentDimensions(dim);
+					}
+				}
 				this.attachImageModel();
 
 				if ( !this.imageModel.isDefaultSize() ) {
