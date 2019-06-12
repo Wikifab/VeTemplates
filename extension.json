@@ -79,12 +79,13 @@
 				"vetemplate-templatetitle-pin",
 				"vetemplate-templatetitle-warning",
 				"visualeditor-mediasizewidget-label-width-limit-error",
-				"pmgmediadialog-fileexists"
+				"pmgmediadialog-fileexists",
+				"vetemplates-filename-already-exists"
 			]
 		}
 	},
 	"APIModules": {
-		"vetemplates_checkfileexists": "VeTemplates\\ApiCheckFileExists"
+		"vetemplates_checkfileconflicts": "VeTemplates\\ApiCheckFileConflicts"
 	},
 	"ResourceFileModulePaths": {
 		"localBasePath": "",
@@ -92,7 +93,7 @@
 	},
 	"AutoloadClasses": {
 		"VeTemplates\\Hooks": "includes/Hooks.php",
-		"VeTemplates\\ApiCheckFileExists": "includes/ApiCheckFileExists.php"
+		"VeTemplates\\ApiCheckFileConflicts": "includes/ApiCheckFileConflicts.php"
 	},
 	"manifest_version": 1
 }

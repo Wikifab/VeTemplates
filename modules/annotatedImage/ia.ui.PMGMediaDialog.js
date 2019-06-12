@@ -488,6 +488,26 @@ ve.ui.PMGMediaDialog.prototype.uploadPageNameSet = function ( pageName ) {
 	}
 };
 
+/**
+ * @inheritdoc
+ */
+ve.ui.PMGMediaDialog.prototype.executeAction = function ( action ) {
+	var dialog = this;
+	return OO.ui.ProcessDialog.prototype.executeAction.call( this, action )
+		.fail( function ( errors ) {
+
+			var mediaUploadBooklet = dialog.mediaUploadBooklet,
+			upload = mediaUploadBooklet.upload,
+			state = upload.getState(),
+			stateDetails = upload.getStateDetails();
+
+			// we just want to enable this ability which has been wrongly disabled
+			if (state === mw.Upload.State.WARNING && stateDetails.conflictingname != undefined) {
+				dialog.actions.setAbilities( { save: true } );
+			}
+		} );
+};
+
 ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
 
 	// we remove originals tabs (search an upload) to replace by others :
@@ -1126,6 +1146,21 @@ ve.ui.PMGMediaDialog.prototype.getSetupProcess = function ( data ) {
 				this.isInsertion = false;
 				// Create image model
 				this.setModelFromNode(this.selectedNode);
+				if (this.imageModel.attributesCache.size) {
+					// fix issue : dimension bug when empty :
+					var scalableObject = this.imageModel.getScalable();
+					if (! scalableObject.getCurrentDimensions()) {
+						var ratio = scalableObject.ratio || 0.75;
+						var dim = {
+								width: parseInt(this.imageModel.attributesCache.size.replace('px','')),
+								height: 300
+						}
+						dim.height = parseInt(dim.width * ratio);
+						console.log("fix dimensions : ");
+						console.log(dim);
+						scalableObject.setCurrentDimensions(dim);
+					}
+				}
 				this.attachImageModel();
 
 				if ( !this.imageModel.isDefaultSize() ) {

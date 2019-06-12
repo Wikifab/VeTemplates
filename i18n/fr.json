@@ -22,5 +22,7 @@
 	"vetemplate-templatetitle-pin": "Inviter à la mémorisation",
 	"vetemplate-templatetitle-warning": "Prévenir d'un danger",
 	"visualeditor-mediasizewidget-label-width-limit-error": "Largeur limite : $1.",
-	"pmgmediadialog-fileexists": "Ce fichier existe déjà (voir ci-dessous). Souhaitez-vous utiliser l'existant?"
+	"pmgmediadialog-fileexists": "Ce fichier existe déjà (voir ci-dessous). Souhaitez-vous utiliser l'existant ?",
+	"vetemplates-filename-already-exists": "Nom de fichier existant. Réessayez avec un autre."
+
 }

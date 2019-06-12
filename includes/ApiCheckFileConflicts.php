@@ -9,7 +9,7 @@ use LocalFile;
 use RepoGroup;
 use FSFile;
 
-class ApiCheckFileExists extends ApiBase {
+class ApiCheckFileConflicts extends ApiBase {
 
 	public function __construct($query, $moduleName) {
 		parent::__construct ( $query, $moduleName );
@@ -37,23 +37,52 @@ class ApiCheckFileExists extends ApiBase {
 	}
 	public function execute() {
 
+		// get params
 		$this->file = $this->getMain()->getUpload( 'file' );
 		$this->filename = $this->getMain()->getVal( 'filename' );
 
+		$res = array();
+
+		// let's check whether a file with same name exists
+		$title = Title::newFromText($this->filename);
+		$fileWithSameName = RepoGroup::singleton()->findFile( $title );
+
+		if ($fileWithSameName) {
+			$res['type'] = 'conflictingname';
+			$this->getResult()->addValue ( null, $this->getModuleName(), $res );
+			return;
+		}
+
+		// okay, then check whether file already exists (with hash)
 		$hash = FSFile::getSha1Base36FromPath( $this->file->getTempName() );
 
 		$dupes = RepoGroup::singleton()->findBySha1( $hash );
-		$dupesInfos = array();
-		foreach ($dupes as $key => $dupe){
-			if ($dupe instanceof LocalFile) {
-				$imageInfo = $this->getImageInfo($dupe);
-				if ($imageInfo) {
-					$dupesInfos[] = $imageInfo;
+
+		if (!empty($dupes)) {
+
+			$dupesInfos = array();
+
+			foreach ($dupes as $key => $dupe){
+				if ($dupe instanceof LocalFile) {
+					$imageInfo = $this->getImageInfo($dupe);
+					if ($imageInfo) {
+						$dupesInfos[] = $imageInfo;
+					}
 				}
+			}
+
+			if (!empty($dupesInfos)) {
+				$res['type'] = 'fileexists';
+				$res['dupes'] = $dupesInfos;
+				$this->getResult()->addValue ( null, $this->getModuleName(), $res );
+				return;
 			}
 		}
 
-		$this->getResult()->addValue ( null, $this->getModuleName(), $dupesInfos );
+		// everything's okay
+		$res['type'] = 'noconflict';
+		$this->getResult()->addValue ( null, $this->getModuleName(), $res );
+			return;
 	}
 
 	/**
