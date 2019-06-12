@@ -407,7 +407,6 @@
 		);
 	};
 
-
 	mw.VeTemplateUpload.BookletLayout.prototype.validateFilenameExists = function ( filename ) {
 		// old call from validateFilename : just name file existence :
 		return ( new mw.Api() ).get( {
@@ -437,11 +436,13 @@
 
 	/**
 	 * @param {mw.Title} filename
-	 * @return {jQuery.Promise} Resolves (on success) or rejects with OO.ui.Error
+	 * @return {jQuery.Promise}
 	 */
 	mw.VeTemplateUpload.BookletLayout.prototype.validateFilename = function ( filename ) {
 
 		var layout = this;
+
+		var deferred = $.Deferred();
 
 		var file = this.getFile();
 
@@ -458,7 +459,7 @@
 
 			var token = jsondata.query.tokens.csrftoken;
 			var formdata = new FormData(); //see https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
-			formdata.append("action", "vetemplates_checkfileexists");
+			formdata.append("action", "vetemplates_checkfileconflicts");
 			formdata.append("format", "json");
 			formdata.append("filename", filename);
 			formdata.append("token", token );
@@ -471,28 +472,53 @@
     			processData: false,
     			contentType:false
     		}).done(function(res) {
-				var dupes = res.vetemplates_checkfileexists;
 
-				if (typeof dupes !== 'undefined' && dupes.length > 0) {
+    			var res = res.vetemplates_checkfileconflicts;
 
-					var imageInfo = dupes[0];
+    			var type = res.type;
 
-					// set the upload object state to warning and save the file's info for future use
-					layout.upload.setState( mw.Upload.State.WARNING, { fileexists: true, existingfile: imageInfo } );
-					layout.setPage( 'insert' );
+				switch (type) {
+				  case 'noconflict':
+				    deferred.resolve();
+				    break;
+				  case 'conflictingname':
+				  	layout.upload.setState( mw.Upload.State.WARNING, { conflictingname : true } );
+				  	deferred.reject( new OO.ui.Error(
+						$( '<p>' ).msg( 'vetemplates-filename-already-exists' ),
+						{ recoverable: false }
+					) );
 
-					return $.Deferred().resolve();
+				  	break;
+				  case 'fileexists':
+				  	var dupes = res.dupes;
+
+				  	if (dupes != undefined && dupes.length > 0) {
+
+				  		var imageInfo = dupes[0];
+
+				  		// set the upload object state to warning and save the file's info for future use
+						layout.upload.setState( mw.Upload.State.WARNING, { fileexists: true, existingfile: imageInfo } );
+						layout.setPage( 'insert' );
+
+						deferred.resolve(); // we should actually reject, but then OOUI fires a popup message
+				  	}
+
+				  	deferred.resolve();
+
+				    break;
+				  default:
+				  	deferred.resolve();
 				}
-
-				return $.Deferred().resolve();
 			})
 			.fail(function(xhr, ajaxOptions, thrownError) {
 				// console.log("error");
 				// console.log(xhr);
 				// console.log(thrownError);
-				return $.Deferred().resolve();
+				deferred.resolve();
 			});
 		}
+
+		return deferred.promise();
 	};
 
 	/**
@@ -505,9 +531,7 @@
 			mw.config.get( 'wgNamespaceIds' ).file
 		);
 
-		return this.uploadPromise
-			/* use our own validateFileName function */
-			.then( this.validateFilename.bind( this, title ) )
+		return this.validateFilename( title )
 			/* if everything went fine until here, let the parent have a word */
 			.done( mw.ForeignStructuredUpload.BookletLayout.parent.prototype.saveFile.bind( this ) );
 	};

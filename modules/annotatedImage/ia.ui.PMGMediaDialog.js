@@ -488,6 +488,26 @@ ve.ui.PMGMediaDialog.prototype.uploadPageNameSet = function ( pageName ) {
 	}
 };
 
+/**
+ * @inheritdoc
+ */
+ve.ui.PMGMediaDialog.prototype.executeAction = function ( action ) {
+	var dialog = this;
+	return OO.ui.ProcessDialog.prototype.executeAction.call( this, action )
+		.fail( function ( errors ) {
+
+			var mediaUploadBooklet = dialog.mediaUploadBooklet,
+			upload = mediaUploadBooklet.upload,
+			state = upload.getState(),
+			stateDetails = upload.getStateDetails();
+
+			// we just want to enable this ability which has been wrongly disabled
+			if (state === mw.Upload.State.WARNING && stateDetails.conflictingname != undefined) {
+				dialog.actions.setAbilities( { save: true } );
+			}
+		} );
+};
+
 ve.ui.PMGMediaDialog.prototype.buildPMGSearchPanel = function () {
 
 	// we remove originals tabs (search an upload) to replace by others :
