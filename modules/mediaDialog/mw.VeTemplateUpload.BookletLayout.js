@@ -457,11 +457,14 @@
 
 		function onTokenSuccess( jsondata ) {
 
+			console.log('filename', filename);
+
 			var token = jsondata.query.tokens.csrftoken;
 			var formdata = new FormData(); //see https://developer.mozilla.org/en-US/docs/Web/API/FormData/Using_FormData_Objects
 			formdata.append("action", "vetemplates_checkfileconflicts");
 			formdata.append("format", "json");
-			formdata.append("filename", filename);
+			formdata.append("filename", filename.title + '.' + filename.ext);
+			formdata.append("prefixedFilename", filename);
 			formdata.append("token", token );
 			formdata.append("file", file);
 
@@ -511,9 +514,9 @@
 				}
 			})
 			.fail(function(xhr, ajaxOptions, thrownError) {
-				// console.log("error");
-				// console.log(xhr);
-				// console.log(thrownError);
+				console.log("error");
+				console.log(xhr);
+				console.log(thrownError);
 				deferred.resolve();
 			});
 		}
