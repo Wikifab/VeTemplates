@@ -18,11 +18,15 @@ class ApiCheckFileConflicts extends ApiBase {
 	public function getAllowedParams()
     {
         return array (
-			'file' => array ( // search value
+			'file' => array (
 					ApiBase::PARAM_TYPE => 'upload',
 					ApiBase::PARAM_REQUIRED => true
 			),
-			'filename' => array ( // search value
+			'filename' => array (
+					ApiBase::PARAM_TYPE => 'string',
+					ApiBase::PARAM_REQUIRED => true
+			),
+			'prefixedFilename' => array (
 					ApiBase::PARAM_TYPE => 'string',
 					ApiBase::PARAM_REQUIRED => true
 			)
@@ -40,11 +44,12 @@ class ApiCheckFileConflicts extends ApiBase {
 		// get params
 		$this->file = $this->getMain()->getUpload( 'file' );
 		$this->filename = $this->getMain()->getVal( 'filename' );
+		$this->prefixedFilename = $this->getMain()->getVal( 'prefixedFilename' );
 
 		$res = array();
 
 		// let's check whether a file with same name exists
-		$title = Title::newFromText($this->filename);
+		$title = Title::newFromText($this->prefixedFilename);
 		$fileWithSameName = RepoGroup::singleton()->findFile( $title );
 
 		if ($fileWithSameName) {
@@ -74,6 +79,29 @@ class ApiCheckFileConflicts extends ApiBase {
 			if (!empty($dupesInfos)) {
 				$res['type'] = 'fileexists';
 				$res['dupes'] = $dupesInfos;
+				$this->getResult()->addValue ( null, $this->getModuleName(), $res );
+				return;
+			}
+		}
+
+		// try with different extensions (that's what MW does)
+		$exists = self::checkByExtension( $this->file, $this->filename );
+
+		if ($exists != false) {
+
+			$dupesInfos = array();
+
+			foreach ($exists as $key => $dupe){
+				if ($dupe instanceof LocalFile) {
+					$imageInfo = $this->getImageInfo($dupe);
+					if ($imageInfo) {
+						$dupesInfos[] = $imageInfo;
+					}
+				}
+			}
+
+			if (!empty($dupesInfos)) {
+				$res['type'] = 'conflictingname';
 				$this->getResult()->addValue ( null, $this->getModuleName(), $res );
 				return;
 			}
@@ -123,6 +151,53 @@ class ApiCheckFileConflicts extends ApiBase {
 			$first = array_values($res['query']['pages'])[0];
 
 			return $first['imageinfo'][0];
+		}
+
+		return false;
+	}
+
+	/**
+	 * Helper function that does various existence checks for a file.
+	 * The following checks are performed:
+	 *
+	 * - File exists with normalized extension
+	 * - File exists with the same name but a different extension
+	 *
+	 * @param File $file The File object to check
+	 * @return mixed False if the file does not exists, else an array
+	 */
+	public static function checkByExtension( $file, $filename ) {
+
+		if ( strpos( $filename, '.' ) == false ) {
+			$partname = $filename;
+			$extension = '';
+		} else {
+			$n = strrpos( $filename, '.' );
+			$extension = substr( $filename, $n + 1 );
+			$partname = substr( $filename, 0, $n );
+		}
+		$normalizedExtension = \File::normalizeExtension( $extension );
+
+		if ( $normalizedExtension != $extension ) {
+			// We're not using the normalized form of the extension.
+			// Normal form is lowercase, using most common of alternate
+			// extensions (eg 'jpg' rather than 'JPEG').
+
+			// Check for another file using the normalized form...
+			$nt_lc = Title::makeTitle( NS_FILE, "{$partname}.{$normalizedExtension}" );
+			$file_lc = wfLocalFile( $nt_lc );
+
+			if ( $file_lc->exists() ) {
+				return $file_lc;
+			}
+		}
+
+		// Check for files with the same name but a different extension
+		$similarFiles = RepoGroup::singleton()->getLocalRepo()->findFilesByPrefix(
+			"{$partname}.", 1 );
+
+		if ( count( $similarFiles ) ) {
+			return $similarFiles;
 		}
 
 		return false;
