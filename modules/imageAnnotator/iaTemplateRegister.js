@@ -2,6 +2,10 @@
 vetemplate = vetemplate || {};
 vetemplate.imageAnnotator = vetemplate.imageAnnotator || {};
 
+// this was to load template for annotated image
+// it seems not used anymore, this must be checked
+// and delete if needed
+
 vetemplate.iaTemplateRegister = {
 
 		registerTemplate: function(icon = 'media') {
