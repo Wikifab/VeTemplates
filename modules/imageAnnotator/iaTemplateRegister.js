@@ -6,7 +6,7 @@ vetemplate.iaTemplateRegister = {
 
 		registerTemplate: function(icon = 'media') {
 
-
+			var targetWt = '';
 			var templateInfo = [ {
 				type: 'annotatedImageTransclusion',
 				attributes: {
