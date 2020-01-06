@@ -8,8 +8,10 @@ vetemplate.imageAnnotator = vetemplate.imageAnnotator || {};
 
 vetemplate.iaTemplateRegister = {
 
-		registerTemplate: function(icon = 'media') {
-
+		registerTemplate: function(icon) {
+			if ( !icon ) {
+				icon = 'media';
+			}
 			var targetWt = '';
 			var hash = '';
 			var jsondata = '';

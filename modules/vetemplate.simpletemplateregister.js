@@ -1,10 +1,13 @@
 
 
 vetemplate.simpleTemplateRegister = {
-		
-		registerTemplate: function(templateName, icon = 'template') {
-			// 2 element in this array : the element opening the translcusion block, 
+
+		registerTemplate: function(templateName, icon) {
+			// 2 element in this array : the element opening the translcusion block,
 			// and the one closing it (with '/' ahead)
+			if ( !icon ) {
+				icon = 'template';
+			}
 			var templateInfo = [ {
 				//type: 'mwTransclusionBlock',
 				type: 'simpleTransclusion',
@@ -29,7 +32,7 @@ vetemplate.simpleTemplateRegister = {
 				//type: '/mwTransclusionBlock'
 				type: '/simpleTransclusion'
 			} ];
-			
+
 			var commandName = templateName.toLowerCase().replace(/[^a-z]/g, "") + 'block';
 
 			ve.ui.commandRegistry.register(
@@ -38,14 +41,14 @@ vetemplate.simpleTemplateRegister = {
 					supportedSelections: [ 'linear' ]
 				} )
 			);
-			
+
 			//Create and register tool
 			// tools are used only to add button in the toolbar
 			function MyToolInfo() {
 				MyToolInfo.parent.apply( this, arguments );
 			}
 			OO.inheritClass( MyToolInfo, ve.ui.MWTransclusionDialogTool );
-			
+
 			var templateTitle = mw.msg('vetemplate-templatetitle-' + templateName.toLowerCase());
 
 			MyToolInfo.static.name = commandName;
@@ -54,7 +57,7 @@ vetemplate.simpleTemplateRegister = {
 			MyToolInfo.static.title = templateTitle;
 			MyToolInfo.static.commandName = commandName;
 			ve.ui.toolFactory.register( MyToolInfo );
-			
+
 		}
 
 };
